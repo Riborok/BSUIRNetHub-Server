@@ -2,7 +2,7 @@ package com.bsuirnethub.model
 
 import com.bsuirnethub.entity.ContactEntity
 
-data class Contact(
+class Contact(
     var contactId: String? = null,
 ) {
     companion object {

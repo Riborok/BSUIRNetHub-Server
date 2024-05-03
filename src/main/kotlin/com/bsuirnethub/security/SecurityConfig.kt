@@ -1,5 +1,6 @@
 package com.bsuirnethub.security
 
+import com.bsuirnethub.ApiPaths
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.Customizer
@@ -22,8 +23,8 @@ class SecurityConfig {
         return http
             .authorizeHttpRequests { authorize ->
                 authorize
-                    .requestMatchers("/api/public/**").permitAll()
-                    .requestMatchers("/api/private/**").authenticated()
+                    .requestMatchers("${ApiPaths.PUBLIC}/**").permitAll()
+                    .requestMatchers("${ApiPaths.PRIVATE}/**").authenticated()
             }
             .cors(Customizer.withDefaults())
             .oauth2ResourceServer { oauth2: OAuth2ResourceServerConfigurer<HttpSecurity?> ->

@@ -1,5 +1,6 @@
 package com.bsuirnethub.controller
 
+import com.bsuirnethub.ApiPaths
 import com.bsuirnethub.exception.ContactException
 import com.bsuirnethub.model.Contact
 import com.bsuirnethub.service.ContactService
@@ -10,7 +11,7 @@ import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/private/contacts")
+@RequestMapping("${ApiPaths.PRIVATE}/contacts")
 class ContactController(private val contactService: ContactService) {
     @GetMapping
     fun getAllContacts(@AuthenticationPrincipal jwt: Jwt): ResponseEntity<List<Contact>> {
