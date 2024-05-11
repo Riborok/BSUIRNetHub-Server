@@ -1,16 +1,21 @@
 package com.bsuirnethub.model
 
-import com.bsuirnethub.entity.UserEntity
 import java.time.LocalDateTime
 
 class User(
     var userId: String? = null,
     var lastSeen: LocalDateTime? = null,
-    var contacts: List<Contact> = ArrayList()
+    var subscribers: List<Subscriber>? = null
 ) {
-    companion object {
-        fun toModel(entity: UserEntity): User {
-            return User(entity.userId, entity.lastSeen, entity.contacts.map(Contact::toModel).toList())
-        }
+    class Builder {
+        private var userId: String? = null
+        private var lastSeen: LocalDateTime? = null
+        private var subscribers: List<Subscriber>? = null
+
+        fun userId(userId: String?) = apply { this.userId = userId }
+        fun lastSeen(lastSeen: LocalDateTime?) = apply { this.lastSeen = lastSeen }
+        fun subscribers(subscribers: List<Subscriber>?) = apply { this.subscribers = subscribers }
+
+        fun build() = User(userId, lastSeen, subscribers)
     }
 }

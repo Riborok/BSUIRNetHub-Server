@@ -17,5 +17,5 @@ class UserEntity(
     var lastSeen: LocalDateTime? = null,
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
-    var contacts: List<ContactEntity> = ArrayList()
+    var subscribers: List<SubscriberEntity> = ArrayList()
 )

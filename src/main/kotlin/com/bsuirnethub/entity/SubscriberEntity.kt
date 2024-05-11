@@ -3,14 +3,14 @@ package com.bsuirnethub.entity
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "contacts")
-class ContactEntity(
+@Table(name = "subscribers")
+class SubscriberEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
-    @Column(name = "contact_id")
-    var contactId: String? = null,
+    @Column(name = "subscriber_id")
+    var subscriberId: String? = null,
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
