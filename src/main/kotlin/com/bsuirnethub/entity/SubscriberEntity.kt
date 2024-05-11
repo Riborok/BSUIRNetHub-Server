@@ -12,7 +12,7 @@ class SubscriberEntity(
     @Column(name = "subscriber_id")
     var subscriberId: String? = null,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     var user: UserEntity? = null
 )
