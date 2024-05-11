@@ -1,10 +1,8 @@
-package com.bsuirnethub.controller
+package com.bsuirnethub.controller.private_api.user
 
 import com.bsuirnethub.ApiPaths
-import com.bsuirnethub.exception.ContactException
 import com.bsuirnethub.model.Contact
 import com.bsuirnethub.service.ContactService
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
@@ -32,10 +30,5 @@ class ContactController(private val contactService: ContactService) {
         val userId = jwt.subject
         contactService.deleteContact(userId, contactId)
         return ResponseEntity.ok().build()
-    }
-
-    @ExceptionHandler(ContactException::class)
-    fun handleException(ex: RuntimeException): ResponseEntity<Any> {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.message)
     }
 }

@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface ContactRepo: JpaRepository<ContactEntity, Long> {
+interface ContactRepository: JpaRepository<ContactEntity, Long> {
     fun findByUserAndContactId(user: UserEntity, contactId: String): ContactEntity?
 }
