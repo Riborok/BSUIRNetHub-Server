@@ -1,7 +1,6 @@
 package com.bsuirnethub.entity
 
 import jakarta.persistence.*
-import java.time.LocalDateTime
 
 @Entity
 @Table(name = "users", indexes = [Index(name = "idx_user_id", columnList = "user_id")])
@@ -13,9 +12,14 @@ class UserEntity(
     @Column(name = "user_id")
     var userId: String? = null,
 
-    @Column(name = "last_seen")
-    var lastSeen: LocalDateTime? = null,
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "user_subscriptions",
+        joinColumns = [JoinColumn(name = "user_id")],
+        inverseJoinColumns = [JoinColumn(name = "subscription_id")]
+    )
+    var subscriptions: MutableSet<UserEntity> = HashSet(),
 
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
-    var subscribers: List<SubscriberEntity> = ArrayList()
+    @ManyToMany(mappedBy = "subscriptions", fetch = FetchType.LAZY)
+    var subscribers: MutableSet<UserEntity> = HashSet()
 )

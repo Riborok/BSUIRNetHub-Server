@@ -1,21 +1,22 @@
 package com.bsuirnethub.model
 
-import java.time.LocalDateTime
+import com.bsuirnethub.entity.UserEntity
+import com.bsuirnethub.extension.getUserIds
 
-class User(
-    var userId: String? = null,
-    var lastSeen: LocalDateTime? = null,
-    var subscribers: List<Subscriber>? = null
+class User private constructor(
+    var userId: String?,
+    var subscriptionsId: List<String>?,
+    var subscribersId: List<String>?
 ) {
-    class Builder {
+    class Builder(private val userEntity: UserEntity) {
         private var userId: String? = null
-        private var lastSeen: LocalDateTime? = null
-        private var subscribers: List<Subscriber>? = null
+        private var subscriptionsId: List<String>? = null
+        private var subscribersId: List<String>? = null
 
-        fun userId(userId: String?) = apply { this.userId = userId }
-        fun lastSeen(lastSeen: LocalDateTime?) = apply { this.lastSeen = lastSeen }
-        fun subscribers(subscribers: List<Subscriber>?) = apply { this.subscribers = subscribers }
+        fun userId() = apply { this.userId = userEntity.userId }
+        fun subscriptionsId() = apply { this.subscriptionsId = userEntity.subscriptions.getUserIds() }
+        fun subscribersId() = apply { this.subscribersId = userEntity.subscribers.getUserIds() }
 
-        fun build() = User(userId, lastSeen, subscribers)
+        fun build() = User(userId, subscriptionsId, subscribersId)
     }
 }

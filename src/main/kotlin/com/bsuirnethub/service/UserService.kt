@@ -2,28 +2,67 @@ package com.bsuirnethub.service
 
 import com.bsuirnethub.entity.UserEntity
 import com.bsuirnethub.exception.RestStatusException
+import com.bsuirnethub.extension.getUserIds
+import com.bsuirnethub.model.User
 import com.bsuirnethub.repository.UserRepository
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
+import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional
 class UserService(private val userRepository: UserRepository) {
-    fun updateLastSeen(userId: String, lastSeen: LocalDateTime): UserEntity {
-        val user = findUserOrThrow(userId)
-        validateLastSeen(lastSeen, user.lastSeen)
-        user.lastSeen = lastSeen
-        return userRepository.save(user)
+    fun createUser(userId: String) {
+        val user = UserEntity(userId = userId)
+        userRepository.save(user)
     }
 
-    fun findUserOrThrow(userId: String): UserEntity {
+    fun deleteUser(userId: String) {
+        userRepository.deleteByUserId(userId)
+    }
+
+    fun getUserById(userId: String): User {
+        val user = findUserEntityOrThrow(userId)
+        return User.Builder(user)
+            .userId()
+            .subscriptionsId()
+            .subscribersId()
+            .build()
+    }
+
+    private fun findUserEntityOrThrow(userId: String): UserEntity {
         return userRepository.findByUserId(userId)
             ?: throw RestStatusException("User with id $userId not found", HttpStatus.NOT_FOUND)
     }
 
-    private fun validateLastSeen(lastSeen: LocalDateTime, userLastSeen: LocalDateTime?) {
-        if (lastSeen < userLastSeen || lastSeen > LocalDateTime.now()) {
-            throw RestStatusException("Invalid lastSeen value", HttpStatus.BAD_REQUEST)
+    fun addSubscription(userId: String, subscriptionId: String) {
+        validateUserIsNotSubscription(userId, subscriptionId)
+        val user = findUserEntityOrThrow(userId)
+        val subscription = findUserEntityOrThrow(subscriptionId)
+        user.subscriptions.add(subscription)
+        userRepository.save(user)
+    }
+
+    private fun validateUserIsNotSubscription(userId: String, subscriptionId: String) {
+        if (userId == subscriptionId) {
+            throw RestStatusException("You can't subscribe to yourself", HttpStatus.BAD_REQUEST)
         }
+    }
+
+    fun deleteSubscription(userId: String, subscriptionId: String) {
+        val user = findUserEntityOrThrow(userId)
+        val subscription = findUserEntityOrThrow(subscriptionId)
+        user.subscriptions.remove(subscription)
+        userRepository.save(user)
+    }
+
+    fun getSubscriptions(userId: String): List<String> {
+        val user = findUserEntityOrThrow(userId)
+        return user.subscriptions.getUserIds()
+    }
+
+    fun getSubscribers(userId: String): List<String> {
+        val user = findUserEntityOrThrow(userId)
+        return user.subscribers.getUserIds()
     }
 }
