@@ -25,8 +25,8 @@ class UserService(private val userRepository: UserRepository) {
         val user = findUserEntityOrThrow(userId)
         return User.Builder(user)
             .userId()
-            .subscriptionsId()
-            .subscribersId()
+            .subscriptionIds()
+            .subscriberIds()
             .build()
     }
 
@@ -56,12 +56,12 @@ class UserService(private val userRepository: UserRepository) {
         userRepository.save(user)
     }
 
-    fun getSubscriptions(userId: String): List<String> {
+    fun getSubscriptionIds(userId: String): List<String> {
         val user = findUserEntityOrThrow(userId)
         return user.subscriptions.getUserIds()
     }
 
-    fun getSubscribers(userId: String): List<String> {
+    fun getSubscriberIds(userId: String): List<String> {
         val user = findUserEntityOrThrow(userId)
         return user.subscribers.getUserIds()
     }

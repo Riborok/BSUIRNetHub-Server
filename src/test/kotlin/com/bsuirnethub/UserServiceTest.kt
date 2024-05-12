@@ -56,8 +56,8 @@ class UserServiceTest {
         userService.createUser("user2")
         userService.addSubscription("user1", "user2")
         val user = userService.getUserById("user1")
-        assertNotNull(user.subscriptionsId)
-        assertEquals(1, user.subscriptionsId!!.size)
+        assertNotNull(user.subscriptionIds)
+        assertEquals(1, user.subscriptionIds!!.size)
     }
 
     @Test
@@ -67,8 +67,8 @@ class UserServiceTest {
         userService.addSubscription("user1", "user2")
         userService.deleteSubscription("user1", "user2")
         val user = userService.getUserById("user1")
-        assertNotNull(user.subscriptionsId)
-        assertEquals(0, user.subscriptionsId!!.size)
+        assertNotNull(user.subscriptionIds)
+        assertEquals(0, user.subscriptionIds!!.size)
     }
 
     @Test
@@ -76,7 +76,7 @@ class UserServiceTest {
         userService.createUser("user1")
         userService.createUser("user2")
         userService.addSubscription("user1", "user2")
-        val subscriptions = userService.getSubscriptions("user1")
+        val subscriptions = userService.getSubscriptionIds("user1")
         assertEquals(1, subscriptions.size)
         assertEquals("user2", subscriptions[0])
     }
@@ -86,7 +86,7 @@ class UserServiceTest {
         userService.createUser("user1")
         userService.createUser("user2")
         userService.addSubscription("user1", "user2")
-        val subscribers = userService.getSubscribers("user2")
+        val subscribers = userService.getSubscriberIds("user2")
         assertNotNull(subscribers)
         assertEquals(1, subscribers.size)
         assertEquals("user1", subscribers[0])
@@ -99,8 +99,8 @@ class UserServiceTest {
         userService.addSubscription("user1", "user2")
         userService.addSubscription("user2", "user1")
         userService.deleteUser("user2")
-        val subscribers = userService.getSubscribers("user1")
-        val subscriptions = userService.getSubscriptions("user1")
+        val subscribers = userService.getSubscriberIds("user1")
+        val subscriptions = userService.getSubscriptionIds("user1")
         assertEquals(0, subscribers.size)
         assertEquals(0, subscriptions.size)
     }

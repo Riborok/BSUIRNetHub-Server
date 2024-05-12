@@ -31,18 +31,18 @@ class UserController(private val userService: UserService) {
     }
 
     @GetMapping("/me/subscriptions")
-    fun getSubscriptions(
+    fun getSubscriptionIds(
         @AuthenticationPrincipal jwt: Jwt
     ): ResponseEntity<List<String>> {
         val userId = jwt.subject
-        return ResponseEntity.ok(userService.getSubscriptions(userId))
+        return ResponseEntity.ok(userService.getSubscriptionIds(userId))
     }
 
     @GetMapping("/me/subscribers")
-    fun getSubscribers(
+    fun getSubscriberIds(
         @AuthenticationPrincipal jwt: Jwt
     ): ResponseEntity<List<String>> {
         val userId = jwt.subject
-        return ResponseEntity.ok(userService.getSubscribers(userId))
+        return ResponseEntity.ok(userService.getSubscriberIds(userId))
     }
 }

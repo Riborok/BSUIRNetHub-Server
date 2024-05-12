@@ -5,18 +5,18 @@ import com.bsuirnethub.extension.getUserIds
 
 class User private constructor(
     var userId: String?,
-    var subscriptionsId: List<String>?,
-    var subscribersId: List<String>?
+    var subscriptionIds: List<String>?,
+    var subscriberIds: List<String>?
 ) {
     class Builder(private val userEntity: UserEntity) {
         private var userId: String? = null
-        private var subscriptionsId: List<String>? = null
-        private var subscribersId: List<String>? = null
+        private var subscriptionIds: List<String>? = null
+        private var subscriberIds: List<String>? = null
 
         fun userId() = apply { this.userId = userEntity.userId }
-        fun subscriptionsId() = apply { this.subscriptionsId = userEntity.subscriptions.getUserIds() }
-        fun subscribersId() = apply { this.subscribersId = userEntity.subscribers.getUserIds() }
+        fun subscriptionIds() = apply { this.subscriptionIds = userEntity.subscriptions.getUserIds() }
+        fun subscriberIds() = apply { this.subscriberIds = userEntity.subscribers.getUserIds() }
 
-        fun build() = User(userId, subscriptionsId, subscribersId)
+        fun build() = User(userId, subscriptionIds, subscriberIds)
     }
 }
