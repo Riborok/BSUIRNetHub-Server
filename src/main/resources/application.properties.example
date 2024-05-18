@@ -1,0 +1,7 @@
+spring.application.name=bsuirnethub
+
+spring.jpa.hibernate.ddl-auto=update
+spring.datasource.url=jdbc:mysql://localhost:3306/{database_name}?useUnicode=true&useSSL=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+spring.datasource.username={username}
+spring.datasource.password={password}
+spring.jpa.show-sql=true
