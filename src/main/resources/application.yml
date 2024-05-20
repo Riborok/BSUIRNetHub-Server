@@ -4,5 +4,5 @@ server:
 
 okta:
   oauth2:
-    issuer: https://dev-joeg8c7wp21zwm78.us.auth0.com/
-    audience: https://dev-joeg8c7wp21zwm78.us.auth0.com/api/v2/
+    issuer: https://dev-hhkjtfxyb0bg02d1.us.auth0.com/
+    audience: https://dev-hhkjtfxyb0bg02d1.us.auth0.com/api/v2/
