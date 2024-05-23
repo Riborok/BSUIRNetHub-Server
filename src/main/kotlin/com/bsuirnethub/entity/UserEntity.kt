@@ -10,7 +10,7 @@ class UserEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
-    @Column(name = "user_id")
+    @Column(name = "user_id", unique = true)
     var userId: UserId? = null,
 
     @ManyToMany(fetch = FetchType.LAZY)

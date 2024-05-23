@@ -7,6 +7,7 @@ import com.bsuirnethub.exception.RestStatusException
 import com.bsuirnethub.extension.getUserIds
 import com.bsuirnethub.model.User
 import com.bsuirnethub.repository.UserRepository
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -15,8 +16,12 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class UserService(private val userFinder: UserFinder, private val userRepository: UserRepository) {
     fun createUser(userId: UserId) {
-        val user = UserEntity(userId = userId)
-        userRepository.save(user)
+        try {
+            val user = UserEntity(userId = userId)
+            userRepository.save(user)
+        } catch (e: DataIntegrityViolationException) {
+            throw RestStatusException("User with id $userId already exists", HttpStatus.CONFLICT)
+        }
     }
 
     fun deleteUser(userId: UserId) {

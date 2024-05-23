@@ -1,11 +1,13 @@
 package com.bsuirnethub
 
+import com.bsuirnethub.exception.RestStatusException
 import com.bsuirnethub.repository.UserRepository
 import com.bsuirnethub.service.UserService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 
@@ -33,6 +35,14 @@ class UserServiceTest {
         userService.createUser("user1")
         val user = userRepository.findByUserId("user1")
         assertNotNull(user)
+    }
+
+    @Test
+    fun `test createUserWithDuplicateUserId`() {
+        userService.createUser("user1")
+        assertThrows<RestStatusException> {
+            userService.createUser("user1")
+        }
     }
 
     @Test
