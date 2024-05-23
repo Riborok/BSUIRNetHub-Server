@@ -1,5 +1,6 @@
 package com.bsuirnethub.entity
 
+import com.bsuirnethub.alias.UserId
 import jakarta.persistence.*
 
 @Entity
@@ -10,7 +11,7 @@ class UserEntity(
     var id: Long? = null,
 
     @Column(name = "user_id")
-    var userId: String? = null,
+    var userId: UserId? = null,
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

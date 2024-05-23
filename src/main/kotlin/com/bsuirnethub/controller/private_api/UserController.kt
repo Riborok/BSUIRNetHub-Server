@@ -1,6 +1,7 @@
 package com.bsuirnethub.controller.private_api
 
 import com.bsuirnethub.ApiPaths
+import com.bsuirnethub.alias.UserId
 import com.bsuirnethub.service.UserService
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -13,7 +14,7 @@ class UserController(private val userService: UserService) {
     @PostMapping("/me/subscriptions/{subscriptionId}")
     fun addSubscription(
         @AuthenticationPrincipal jwt: Jwt,
-        @PathVariable subscriptionId: String
+        @PathVariable subscriptionId: UserId
     ): ResponseEntity<Any> {
         val userId = jwt.subject
         userService.addSubscription(userId, subscriptionId)
@@ -23,7 +24,7 @@ class UserController(private val userService: UserService) {
     @DeleteMapping("/me/subscriptions/{subscriptionId}")
     fun deleteSubscription(
         @AuthenticationPrincipal jwt: Jwt,
-        @PathVariable subscriptionId: String
+        @PathVariable subscriptionId: UserId
     ): ResponseEntity<Any> {
         val userId = jwt.subject
         userService.deleteSubscription(userId, subscriptionId)
@@ -33,7 +34,7 @@ class UserController(private val userService: UserService) {
     @GetMapping("/me/subscriptions")
     fun getSubscriptionIds(
         @AuthenticationPrincipal jwt: Jwt
-    ): ResponseEntity<List<String>> {
+    ): ResponseEntity<List<UserId>> {
         val userId = jwt.subject
         return ResponseEntity.ok(userService.getSubscriptionIds(userId))
     }
@@ -41,7 +42,7 @@ class UserController(private val userService: UserService) {
     @GetMapping("/me/subscribers")
     fun getSubscriberIds(
         @AuthenticationPrincipal jwt: Jwt
-    ): ResponseEntity<List<String>> {
+    ): ResponseEntity<List<UserId>> {
         val userId = jwt.subject
         return ResponseEntity.ok(userService.getSubscriberIds(userId))
     }
