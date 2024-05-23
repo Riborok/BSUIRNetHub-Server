@@ -88,7 +88,7 @@ class UserServiceTest {
         userService.addSubscription("user1", "user2")
         val subscriptions = userService.getSubscriptionIds("user1")
         assertEquals(1, subscriptions.size)
-        assertEquals("user2", subscriptions[0])
+        assertEquals("user2", subscriptions[0].userId)
     }
 
     @Test
@@ -99,7 +99,7 @@ class UserServiceTest {
         val subscribers = userService.getSubscriberIds("user2")
         assertNotNull(subscribers)
         assertEquals(1, subscribers.size)
-        assertEquals("user1", subscribers[0])
+        assertEquals("user1", subscribers[0].userId)
     }
 
     @Test

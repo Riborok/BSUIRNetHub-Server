@@ -4,8 +4,10 @@ import com.bsuirnethub.alias.UserId
 import com.bsuirnethub.component.UserFinder
 import com.bsuirnethub.entity.UserEntity
 import com.bsuirnethub.exception.RestStatusException
-import com.bsuirnethub.extension.toShallowUsers
 import com.bsuirnethub.model.User
+import com.bsuirnethub.model.toFullUser
+import com.bsuirnethub.model.toShallowUser
+import com.bsuirnethub.model.toShallowUsers
 import com.bsuirnethub.repository.UserRepository
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
@@ -19,7 +21,7 @@ class UserService(private val userFinder: UserFinder, private val userRepository
         try {
             var userEntity = UserEntity(userId = userId)
             userEntity = userRepository.save(userEntity)
-            return User.Builder(userEntity).buildShallow()
+            return userEntity.toShallowUser()
         } catch (e: DataIntegrityViolationException) {
             throw RestStatusException("User with id $userId already exists", HttpStatus.CONFLICT)
         }
@@ -31,7 +33,7 @@ class UserService(private val userFinder: UserFinder, private val userRepository
 
     fun getUserById(userId: UserId): User {
         val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
-        return User.Builder(userEntity).buildFull()
+        return userEntity.toFullUser()
     }
 
     fun addSubscription(userId: UserId, subscriptionId: UserId): User {
@@ -40,7 +42,7 @@ class UserService(private val userFinder: UserFinder, private val userRepository
         val subscriptionEntity = userFinder.findUserEntityByIdOrThrow(subscriptionId)
         userEntity.subscriptions.add(subscriptionEntity)
         userRepository.save(userEntity)
-        return User.Builder(subscriptionEntity).buildShallow()
+        return subscriptionEntity.toShallowUser()
     }
 
     private fun validateUserIsNotSubscription(userId: UserId, subscriptionId: UserId) {

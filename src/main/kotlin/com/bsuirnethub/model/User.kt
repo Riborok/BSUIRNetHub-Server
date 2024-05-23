@@ -2,7 +2,6 @@ package com.bsuirnethub.model
 
 import com.bsuirnethub.alias.UserId
 import com.bsuirnethub.entity.UserEntity
-import com.bsuirnethub.extension.toShallowUsers
 import com.fasterxml.jackson.annotation.JsonInclude
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -21,15 +20,27 @@ class User private constructor(
         fun subscriberIds() = apply { this.subscriberIds = userEntity.subscribers.toShallowUsers() }
 
         fun build() = User(userId, subscriptionIds, subscriberIds)
-
-        fun buildFull() = apply {
-            userId()
-            subscriptionIds()
-            subscriberIds()
-        }.build()
-
-        fun buildShallow() = apply {
-            userId()
-        }.build()
     }
+}
+
+fun UserEntity.toShallowUser(): User {
+    return User.Builder(this)
+        .userId()
+        .build()
+}
+
+fun UserEntity.toFullUser(): User {
+    return User.Builder(this)
+        .userId()
+        .subscriptionIds()
+        .subscriberIds()
+        .build()
+}
+
+fun Collection<UserEntity>.toShallowUsers(): List<User> {
+    return this.map { it.toShallowUser() }
+}
+
+fun Collection<UserEntity>.toFullUsers(): List<User> {
+    return this.map { it.toFullUser() }
 }
