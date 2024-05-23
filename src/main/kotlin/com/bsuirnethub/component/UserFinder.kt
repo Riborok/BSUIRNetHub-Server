@@ -9,18 +9,18 @@ import org.springframework.stereotype.Component
 
 @Component
 class UserFinder(private val userRepository: UserRepository) {
-    fun findUserEntityOrThrow(userId: UserId): UserEntity {
+    fun findUserEntityByIdOrThrow(userId: UserId): UserEntity {
         return userRepository.findByUserId(userId)
             ?: throw RestStatusException("User with id $userId not found", HttpStatus.NOT_FOUND)
     }
 
-    fun findUserEntitiesOrThrow(userIds: List<UserId>): List<UserEntity> {
-        val users = findExistingUsers(userIds)
+    fun findUserEntitiesByIdsOrThrow(userIds: List<UserId>): List<UserEntity> {
+        val users = findExistingUserEntitiesByIds(userIds)
         checkUsersExistence(userIds, users)
         return users
     }
 
-    private fun findExistingUsers(userIds: List<UserId>): List<UserEntity> {
+    private fun findExistingUserEntitiesByIds(userIds: List<UserId>): List<UserEntity> {
         return userIds.mapNotNull { userId ->
             userRepository.findByUserId(userId)
         }

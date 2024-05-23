@@ -4,7 +4,7 @@ import com.bsuirnethub.alias.UserId
 import com.bsuirnethub.component.UserFinder
 import com.bsuirnethub.entity.UserEntity
 import com.bsuirnethub.exception.RestStatusException
-import com.bsuirnethub.extension.getUserIds
+import com.bsuirnethub.extension.toShallowUsers
 import com.bsuirnethub.model.User
 import com.bsuirnethub.repository.UserRepository
 import org.springframework.dao.DataIntegrityViolationException
@@ -15,10 +15,11 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class UserService(private val userFinder: UserFinder, private val userRepository: UserRepository) {
-    fun createUser(userId: UserId) {
+    fun createUser(userId: UserId): User {
         try {
-            val user = UserEntity(userId = userId)
-            userRepository.save(user)
+            var userEntity = UserEntity(userId = userId)
+            userEntity = userRepository.save(userEntity)
+            return User.Builder(userEntity).buildShallow()
         } catch (e: DataIntegrityViolationException) {
             throw RestStatusException("User with id $userId already exists", HttpStatus.CONFLICT)
         }
@@ -29,20 +30,17 @@ class UserService(private val userFinder: UserFinder, private val userRepository
     }
 
     fun getUserById(userId: UserId): User {
-        val user = userFinder.findUserEntityOrThrow(userId)
-        return User.Builder(user)
-            .userId()
-            .subscriptionIds()
-            .subscriberIds()
-            .build()
+        val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
+        return User.Builder(userEntity).buildFull()
     }
 
-    fun addSubscription(userId: UserId, subscriptionId: UserId) {
+    fun addSubscription(userId: UserId, subscriptionId: UserId): User {
         validateUserIsNotSubscription(userId, subscriptionId)
-        val user = userFinder.findUserEntityOrThrow(userId)
-        val subscription = userFinder.findUserEntityOrThrow(subscriptionId)
-        user.subscriptions.add(subscription)
-        userRepository.save(user)
+        val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
+        val subscriptionEntity = userFinder.findUserEntityByIdOrThrow(subscriptionId)
+        userEntity.subscriptions.add(subscriptionEntity)
+        userRepository.save(userEntity)
+        return User.Builder(subscriptionEntity).buildShallow()
     }
 
     private fun validateUserIsNotSubscription(userId: UserId, subscriptionId: UserId) {
@@ -52,19 +50,19 @@ class UserService(private val userFinder: UserFinder, private val userRepository
     }
 
     fun deleteSubscription(userId: UserId, subscriptionId: UserId) {
-        val user = userFinder.findUserEntityOrThrow(userId)
-        val subscription = userFinder.findUserEntityOrThrow(subscriptionId)
-        user.subscriptions.remove(subscription)
-        userRepository.save(user)
+        val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
+        val subscriptionEntity = userFinder.findUserEntityByIdOrThrow(subscriptionId)
+        userEntity.subscriptions.remove(subscriptionEntity)
+        userRepository.save(userEntity)
     }
 
-    fun getSubscriptionIds(userId: UserId): List<UserId> {
-        val user = userFinder.findUserEntityOrThrow(userId)
-        return user.subscriptions.getUserIds()
+    fun getSubscriptionIds(userId: UserId): List<User> {
+        val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
+        return userEntity.subscriptions.toShallowUsers()
     }
 
-    fun getSubscriberIds(userId: UserId): List<UserId> {
-        val user = userFinder.findUserEntityOrThrow(userId)
-        return user.subscribers.getUserIds()
+    fun getSubscriberIds(userId: UserId): List<User> {
+        val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
+        return userEntity.subscribers.toShallowUsers()
     }
 }
