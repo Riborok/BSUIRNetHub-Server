@@ -12,14 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
-class UserServiceTest {
-
-    @Autowired
-    lateinit var userRepository: UserRepository
-
-    @Autowired
-    lateinit var userService: UserService
-
+class UserServiceTest(
+    @Autowired private val userRepository: UserRepository,
+    @Autowired private val userService: UserService
+) {
     @BeforeEach
     fun setUp() {
         userRepository.deleteAll()
@@ -32,86 +28,45 @@ class UserServiceTest {
 
     @Test
     fun `test createUser`() {
-        userService.createUser("user1")
-        val user = userRepository.findByUserId("user1")
+        val userId = "user1"
+        userService.createUser(userId)
+        val user = userRepository.findByUserId(userId)
         assertNotNull(user)
     }
 
     @Test
-    fun `test createUserWithDuplicateUserId`() {
-        userService.createUser("user1")
+    fun `test createUser With Duplicate UserId`() {
+        val userId = "user1"
+        userService.createUser(userId)
         assertThrows<RestStatusException> {
-            userService.createUser("user1")
+            userService.createUser(userId)
         }
     }
 
     @Test
     fun `test deleteUser`() {
-        userService.createUser("user1")
-        userService.deleteUser("user1")
-        val user = userRepository.findByUserId("user1")
+        val userId = "user1"
+        userService.createUser(userId)
+        userService.deleteUser(userId)
+        val user = userRepository.findByUserId(userId)
         assertNull(user)
     }
 
     @Test
-    fun `test getUserById`() {
-        userService.createUser("user1")
-        val user = userService.getUserById("user1")
-        assertEquals("user1", user.userId)
+    fun `test getUserInfo`() {
+        val userId = "user1"
+        userService.createUser(userId)
+        val user = userService.getUserInfo(userId)
+        assertEquals(userId, user.userId)
     }
 
     @Test
-    fun `test addSubscription`() {
+    fun `test getUserIds`() {
         userService.createUser("user1")
         userService.createUser("user2")
-        userService.addSubscription("user1", "user2")
-        val user = userService.getUserById("user1")
-        assertNotNull(user.subscriptionIds)
-        assertEquals(1, user.subscriptionIds!!.size)
-    }
-
-    @Test
-    fun `test deleteSubscription`() {
-        userService.createUser("user1")
-        userService.createUser("user2")
-        userService.addSubscription("user1", "user2")
-        userService.deleteSubscription("user1", "user2")
-        val user = userService.getUserById("user1")
-        assertNotNull(user.subscriptionIds)
-        assertEquals(0, user.subscriptionIds!!.size)
-    }
-
-    @Test
-    fun `test getSubscriptions`() {
-        userService.createUser("user1")
-        userService.createUser("user2")
-        userService.addSubscription("user1", "user2")
-        val subscriptions = userService.getSubscriptionIds("user1")
-        assertEquals(1, subscriptions.size)
-        assertEquals("user2", subscriptions[0].userId)
-    }
-
-    @Test
-    fun `test getSubscribers`() {
-        userService.createUser("user1")
-        userService.createUser("user2")
-        userService.addSubscription("user1", "user2")
-        val subscribers = userService.getSubscriberIds("user2")
-        assertNotNull(subscribers)
-        assertEquals(1, subscribers.size)
-        assertEquals("user1", subscribers[0].userId)
-    }
-
-    @Test
-    fun `test User Subscriptions And Subscribers After Deleting User`() {
-        userService.createUser("user1")
-        userService.createUser("user2")
-        userService.addSubscription("user1", "user2")
-        userService.addSubscription("user2", "user1")
-        userService.deleteUser("user2")
-        val subscribers = userService.getSubscriberIds("user1")
-        val subscriptions = userService.getSubscriptionIds("user1")
-        assertEquals(0, subscribers.size)
-        assertEquals(0, subscriptions.size)
+        val userIds = userService.getUserIds()
+        assertEquals(2, userIds.size)
+        assertTrue(userIds.any { it.userId == "user1" })
+        assertTrue(userIds.any { it.userId == "user2" })
     }
 }

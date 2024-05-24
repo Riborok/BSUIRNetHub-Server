@@ -4,7 +4,7 @@ import com.bsuirnethub.alias.UserId
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "users", indexes = [Index(name = "idx_user_id", columnList = "user_id")])
+@Table(name = "users")
 class UserEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,7 +13,7 @@ class UserEntity(
     @Column(name = "user_id", unique = true)
     var userId: UserId? = null,
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinTable(
         name = "user_subscriptions",
         joinColumns = [JoinColumn(name = "user_id")],
@@ -21,6 +21,6 @@ class UserEntity(
     )
     var subscriptions: MutableSet<UserEntity> = HashSet(),
 
-    @ManyToMany(mappedBy = "subscriptions", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "subscriptions", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     var subscribers: MutableSet<UserEntity> = HashSet()
 )

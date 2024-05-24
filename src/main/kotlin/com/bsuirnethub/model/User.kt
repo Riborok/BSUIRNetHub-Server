@@ -16,20 +16,20 @@ class User private constructor(
         private var subscriberIds: List<User>? = null
 
         fun userId() = apply { this.userId = userEntity.userId }
-        fun subscriptionIds() = apply { this.subscriptionIds = userEntity.subscriptions.toShallowUsers() }
-        fun subscriberIds() = apply { this.subscriberIds = userEntity.subscribers.toShallowUsers() }
+        fun subscriptionIds() = apply { this.subscriptionIds = userEntity.subscriptions.toUserIds() }
+        fun subscriberIds() = apply { this.subscriberIds = userEntity.subscribers.toUserIds() }
 
         fun build() = User(userId, subscriptionIds, subscriberIds)
     }
 }
 
-fun UserEntity.toShallowUser(): User {
+fun UserEntity.toUserId(): User {
     return User.Builder(this)
         .userId()
         .build()
 }
 
-fun UserEntity.toFullUser(): User {
+fun UserEntity.toUserInfo(): User {
     return User.Builder(this)
         .userId()
         .subscriptionIds()
@@ -37,10 +37,10 @@ fun UserEntity.toFullUser(): User {
         .build()
 }
 
-fun Collection<UserEntity>.toShallowUsers(): List<User> {
-    return this.map { it.toShallowUser() }
+fun Collection<UserEntity>.toUserIds(): List<User> {
+    return this.map { it.toUserId() }
 }
 
-fun Collection<UserEntity>.toFullUsers(): List<User> {
-    return this.map { it.toFullUser() }
+fun Collection<UserEntity>.toUserInfos(): List<User> {
+    return this.map { it.toUserInfo() }
 }
