@@ -16,8 +16,8 @@ class UserJoinLeaveController(private val userService: UserService) {
     fun createUser(
         @AuthenticationPrincipal jwt: Jwt
     ): ResponseEntity<User> {
-        val userId = jwt.subject
-        val createdUser = userService.createUser(userId)
+        val myUserId = jwt.subject
+        val createdUser = userService.createUser(myUserId)
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser)
     }
 
@@ -25,8 +25,8 @@ class UserJoinLeaveController(private val userService: UserService) {
     fun deleteUser(
         @AuthenticationPrincipal jwt: Jwt
     ): ResponseEntity<Any> {
-        val userId = jwt.subject
-        userService.deleteUser(userId)
+        val myUserId = jwt.subject
+        userService.deleteUser(myUserId)
         return ResponseEntity.noContent().build()
     }
 }

@@ -18,8 +18,8 @@ class SubscriptionController(private val subscriptionService: SubscriptionServic
         @AuthenticationPrincipal jwt: Jwt,
         @PathVariable subscriptionId: UserId
     ): ResponseEntity<User> {
-        val userId = jwt.subject
-        val updatedUser = subscriptionService.addSubscription(userId, subscriptionId)
+        val myUserId = jwt.subject
+        val updatedUser = subscriptionService.addSubscription(myUserId, subscriptionId)
         return ResponseEntity.status(HttpStatus.CREATED).body(updatedUser)
     }
 
@@ -28,8 +28,8 @@ class SubscriptionController(private val subscriptionService: SubscriptionServic
         @AuthenticationPrincipal jwt: Jwt,
         @PathVariable subscriptionId: UserId
     ): ResponseEntity<Any> {
-        val userId = jwt.subject
-        subscriptionService.deleteSubscription(userId, subscriptionId)
+        val myUserId = jwt.subject
+        subscriptionService.deleteSubscription(myUserId, subscriptionId)
         return ResponseEntity.noContent().build()
     }
 
@@ -37,15 +37,15 @@ class SubscriptionController(private val subscriptionService: SubscriptionServic
     fun getSubscriptionIds(
         @AuthenticationPrincipal jwt: Jwt
     ): ResponseEntity<List<User>> {
-        val userId = jwt.subject
-        return ResponseEntity.ok(subscriptionService.getSubscriptionIds(userId))
+        val myUserId = jwt.subject
+        return ResponseEntity.ok(subscriptionService.getSubscriptionIds(myUserId))
     }
 
     @GetMapping("/subscribers")
     fun getSubscriberIds(
         @AuthenticationPrincipal jwt: Jwt
     ): ResponseEntity<List<User>> {
-        val userId = jwt.subject
-        return ResponseEntity.ok(subscriptionService.getSubscriberIds(userId))
+        val myUserId = jwt.subject
+        return ResponseEntity.ok(subscriptionService.getSubscriberIds(myUserId))
     }
 }
