@@ -4,6 +4,7 @@ import com.bsuirnethub.ApiPaths
 import com.bsuirnethub.alias.UserId
 import com.bsuirnethub.model.User
 import com.bsuirnethub.service.SubscriptionService
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
@@ -18,7 +19,8 @@ class SubscriptionController(private val subscriptionService: SubscriptionServic
         @PathVariable subscriptionId: UserId
     ): ResponseEntity<User> {
         val userId = jwt.subject
-        return ResponseEntity.ok(subscriptionService.addSubscription(userId, subscriptionId))
+        val updatedUser = subscriptionService.addSubscription(userId, subscriptionId)
+        return ResponseEntity.status(HttpStatus.CREATED).body(updatedUser)
     }
 
     @DeleteMapping("/subscriptions/{subscriptionId}")
@@ -28,7 +30,7 @@ class SubscriptionController(private val subscriptionService: SubscriptionServic
     ): ResponseEntity<Any> {
         val userId = jwt.subject
         subscriptionService.deleteSubscription(userId, subscriptionId)
-        return ResponseEntity.ok().build()
+        return ResponseEntity.noContent().build()
     }
 
     @GetMapping("/subscriptions")

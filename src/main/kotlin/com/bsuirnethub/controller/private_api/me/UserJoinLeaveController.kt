@@ -3,6 +3,7 @@ package com.bsuirnethub.controller.private_api.me
 import com.bsuirnethub.ApiPaths
 import com.bsuirnethub.model.User
 import com.bsuirnethub.service.UserService
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
@@ -16,7 +17,8 @@ class UserJoinLeaveController(private val userService: UserService) {
         @AuthenticationPrincipal jwt: Jwt
     ): ResponseEntity<User> {
         val userId = jwt.subject
-        return ResponseEntity.ok(userService.createUser(userId))
+        val createdUser = userService.createUser(userId)
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser)
     }
 
     @DeleteMapping("/quit")
@@ -25,6 +27,6 @@ class UserJoinLeaveController(private val userService: UserService) {
     ): ResponseEntity<Any> {
         val userId = jwt.subject
         userService.deleteUser(userId)
-        return ResponseEntity.ok().build()
+        return ResponseEntity.noContent().build()
     }
 }
