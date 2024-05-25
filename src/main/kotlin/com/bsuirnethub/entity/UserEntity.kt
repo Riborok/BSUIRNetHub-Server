@@ -22,5 +22,8 @@ class UserEntity(
     var subscriptions: MutableSet<UserEntity> = HashSet(),
 
     @ManyToMany(mappedBy = "subscriptions", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-    var subscribers: MutableSet<UserEntity> = HashSet()
+    var subscribers: MutableSet<UserEntity> = HashSet(),
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var userChats: MutableList<UserChatEntity> = ArrayList()
 )
