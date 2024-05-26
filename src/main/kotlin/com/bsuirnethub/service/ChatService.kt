@@ -24,7 +24,7 @@ class ChatService(
         validateChatDoesNotExist(userEntities)
         var chatEntity = ChatEntity(participants = userEntities)
         chatEntity = chatRepository.save(chatEntity)
-        return chatEntity.toChatInfo()
+        return chatEntity.toModel()
     }
 
     private fun validateChatDoesNotExist(userEntities: Set<UserEntity>) {
@@ -47,6 +47,6 @@ class ChatService(
         validateSenderIdInParticipants(senderId, participantIds)
         val userEntities = userFinder.findUserEntitiesByIdsOrThrow(participantIds).toSet()
         val chatEntity = chatFinder.findSingleChatEntityByParticipantEntitiesOrThrow(userEntities)
-        return chatEntity.toChatInfo()
+        return chatEntity.toModel()
     }
 }

@@ -1,19 +1,18 @@
 package com.bsuirnethub.model
 
+import com.bsuirnethub.alias.UserId
 import com.bsuirnethub.entity.UserChatEntity
-import com.fasterxml.jackson.annotation.JsonInclude
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 class UserChat(
-    var user: User?,
+    var userId: UserId?,
     var chat: Chat?,
     var unreadMessages: Int
 )
 
 fun UserChatEntity.toModel(): UserChat {
     return UserChat(
-        user?.toUserId(),
-        chat?.toChatInfo(),
+        user?.userId,
+        chat?.toModel(),
         unreadMessages
     )
 }

@@ -5,9 +5,7 @@ import com.bsuirnethub.component.UserFinder
 import com.bsuirnethub.entity.UserEntity
 import com.bsuirnethub.exception.RestStatusException
 import com.bsuirnethub.model.User
-import com.bsuirnethub.model.toUserInfo
-import com.bsuirnethub.model.toUserId
-import com.bsuirnethub.model.toUserIds
+import com.bsuirnethub.model.toModel
 import com.bsuirnethub.repository.UserRepository
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
@@ -20,27 +18,33 @@ class UserService(
     private val userFinder: UserFinder,
     private val userRepository: UserRepository
 ) {
-    fun createUser(userId: UserId): User {
-        try {
-            var userEntity = UserEntity(userId = userId)
+    fun createUser(userId: UserId): UserId? {
+        var userEntity = UserEntity(userId = userId)
+        return try {
             userEntity = userRepository.save(userEntity)
-            return userEntity.toUserId()
+            userEntity.userId
         } catch (e: DataIntegrityViolationException) {
             throw RestStatusException("User with id $userId already exists", HttpStatus.CONFLICT)
         }
     }
 
     fun deleteUser(userId: UserId) {
-        userRepository.deleteByUserId(userId)
+        val deletedCount = userRepository.deleteByUserId(userId)
+        validateUserDeletion(deletedCount, userId)
+    }
+
+    private fun validateUserDeletion(deletedCount: Int, userId: UserId) {
+        if (deletedCount == 0)
+            throw RestStatusException("User with id $userId not found", HttpStatus.NOT_FOUND)
     }
 
     fun getUserInfo(userId: UserId): User {
         val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
-        return userEntity.toUserInfo()
+        return userEntity.toModel()
     }
 
-    fun getUserIds(): List<User> {
+    fun getUserIds(): List<UserId?> {
         val userEntities = userRepository.findAll()
-        return userEntities.toUserIds()
+        return userEntities.map { it.userId }
     }
 }

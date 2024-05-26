@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface UserRepository : JpaRepository<UserEntity, Long> {
     fun findByUserId(userId: UserId): UserEntity?
-    fun deleteByUserId(userId: UserId)
+    fun deleteByUserId(userId: UserId): Int
 }

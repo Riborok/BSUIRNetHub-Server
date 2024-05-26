@@ -2,7 +2,6 @@ package com.bsuirnethub.controller.private_api.me
 
 import com.bsuirnethub.ApiPaths
 import com.bsuirnethub.alias.UserId
-import com.bsuirnethub.model.User
 import com.bsuirnethub.service.SubscriptionService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -17,7 +16,7 @@ class SubscriptionController(private val subscriptionService: SubscriptionServic
     fun addSubscription(
         @AuthenticationPrincipal jwt: Jwt,
         @PathVariable subscriptionId: UserId
-    ): ResponseEntity<User> {
+    ): ResponseEntity<UserId?> {
         val myUserId = jwt.subject
         val updatedUser = subscriptionService.addSubscription(myUserId, subscriptionId)
         return ResponseEntity.status(HttpStatus.CREATED).body(updatedUser)
@@ -27,7 +26,7 @@ class SubscriptionController(private val subscriptionService: SubscriptionServic
     fun deleteSubscription(
         @AuthenticationPrincipal jwt: Jwt,
         @PathVariable subscriptionId: UserId
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<Unit> {
         val myUserId = jwt.subject
         subscriptionService.deleteSubscription(myUserId, subscriptionId)
         return ResponseEntity.noContent().build()
@@ -36,7 +35,7 @@ class SubscriptionController(private val subscriptionService: SubscriptionServic
     @GetMapping("/subscriptions")
     fun getSubscriptionIds(
         @AuthenticationPrincipal jwt: Jwt
-    ): ResponseEntity<List<User>> {
+    ): ResponseEntity<List<UserId?>> {
         val myUserId = jwt.subject
         return ResponseEntity.ok(subscriptionService.getSubscriptionIds(myUserId))
     }
@@ -44,7 +43,7 @@ class SubscriptionController(private val subscriptionService: SubscriptionServic
     @GetMapping("/subscribers")
     fun getSubscriberIds(
         @AuthenticationPrincipal jwt: Jwt
-    ): ResponseEntity<List<User>> {
+    ): ResponseEntity<List<UserId?>> {
         val myUserId = jwt.subject
         return ResponseEntity.ok(subscriptionService.getSubscriberIds(myUserId))
     }

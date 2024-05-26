@@ -28,7 +28,7 @@ class UserServiceTest(
 
     @Test
     fun `test createUser`() {
-        val userId = "user1"
+        val userId = "user"
         userService.createUser(userId)
         val user = userRepository.findByUserId(userId)
         assertNotNull(user)
@@ -36,7 +36,7 @@ class UserServiceTest(
 
     @Test
     fun `test createUser With Duplicate UserId`() {
-        val userId = "user1"
+        val userId = "user"
         userService.createUser(userId)
         assertThrows<RestStatusException> {
             userService.createUser(userId)
@@ -45,7 +45,7 @@ class UserServiceTest(
 
     @Test
     fun `test deleteUser`() {
-        val userId = "user1"
+        val userId = "user"
         userService.createUser(userId)
         userService.deleteUser(userId)
         val user = userRepository.findByUserId(userId)
@@ -53,8 +53,16 @@ class UserServiceTest(
     }
 
     @Test
+    fun `test deleteUser with non-existent user`() {
+        val userId = "user"
+        assertThrows<RestStatusException> {
+            userService.deleteUser(userId)
+        }
+    }
+
+    @Test
     fun `test getUserInfo`() {
-        val userId = "user1"
+        val userId = "user"
         userService.createUser(userId)
         val user = userService.getUserInfo(userId)
         assertEquals(userId, user.userId)
@@ -66,7 +74,7 @@ class UserServiceTest(
         userService.createUser("user2")
         val userIds = userService.getUserIds()
         assertEquals(2, userIds.size)
-        assertTrue(userIds.any { it.userId == "user1" })
-        assertTrue(userIds.any { it.userId == "user2" })
+        assertTrue(userIds.any { it == "user1" })
+        assertTrue(userIds.any { it == "user2" })
     }
 }

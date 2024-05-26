@@ -7,6 +7,7 @@ import com.bsuirnethub.repository.ChatRepository
 import com.bsuirnethub.repository.UserChatRepository
 import com.bsuirnethub.repository.UserRepository
 import com.bsuirnethub.service.ChatService
+import com.bsuirnethub.service.UserService
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -21,6 +22,7 @@ class ChatServiceTest(
     @Autowired val chatRepository: ChatRepository,
     @Autowired val userChatRepository: UserChatRepository,
     @Autowired val chatService: ChatService,
+    @Autowired val userService: UserService,
 ) {
     @BeforeEach
     fun setUp() {
@@ -74,6 +76,15 @@ class ChatServiceTest(
         chatService.deleteChat(userId1, chat.id!!)
         assertEquals(0, chatRepository.count())
         assertEquals(0, userChatRepository.count())
+    }
+
+    @Test
+    fun `test deleteChat with non-existent id`() {
+        val userId = "user1"
+        val chatId = 1L
+        assertThrows<RestStatusException> {
+            chatService.deleteChat(userId, chatId)
+        }
     }
 
     @Test
@@ -137,5 +148,28 @@ class ChatServiceTest(
         assertThrows<RestStatusException> {
             chatService.getUniqueChat(userId2, listOf(userId1, userId2))
         }
+    }
+
+    @Test
+    fun `test Chat After Deleting User`() {
+        val userId1 = "user1"
+        val userId2 = "user2"
+        val userId3 = "user3"
+        val user1 = UserEntity(userId = userId1)
+        val user2 = UserEntity(userId = userId2)
+        val user3 = UserEntity(userId = userId3)
+        userRepository.saveAll(listOf(user1, user2, user3))
+        chatService.createUniqueChat(listOf(userId1, userId2))
+        chatService.createUniqueChat(listOf(userId1, userId3))
+        chatService.createUniqueChat(listOf(userId2, userId3))
+        chatService.createUniqueChat(listOf(userId1, userId2, userId3))
+        chatService.createUniqueChat(listOf(userId1))
+        chatService.createUniqueChat(listOf(userId2))
+        chatService.createUniqueChat(listOf(userId3))
+        userService.deleteUser(userId1)
+        userService.deleteUser(userId2)
+        userService.deleteUser(userId3)
+        assertEquals(0, userChatRepository.count())
+        assertEquals(7, chatRepository.count())
     }
 }

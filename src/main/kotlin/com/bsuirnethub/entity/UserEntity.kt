@@ -4,25 +4,28 @@ import com.bsuirnethub.alias.UserId
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "users")
+@Table(
+    name = "users",
+    uniqueConstraints = [
+        UniqueConstraint(
+            name = "uk_user_id",
+            columnNames = ["user_id"]
+        )
+    ]
+)
 class UserEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
-    @Column(name = "user_id", unique = true)
+    @Column(name = "user_id")
     var userId: UserId? = null,
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-    @JoinTable(
-        name = "user_subscriptions",
-        joinColumns = [JoinColumn(name = "user_id")],
-        inverseJoinColumns = [JoinColumn(name = "subscription_id")]
-    )
-    var subscriptions: MutableSet<UserEntity> = HashSet(),
+    @OneToMany(mappedBy = "subscription", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var subscribers: MutableList<SubscriptionEntity> = ArrayList(),
 
-    @ManyToMany(mappedBy = "subscriptions", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-    var subscribers: MutableSet<UserEntity> = HashSet(),
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var subscriptions: MutableList<SubscriptionEntity> = ArrayList(),
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var userChats: MutableList<UserChatEntity> = ArrayList()

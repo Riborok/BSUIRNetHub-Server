@@ -4,7 +4,13 @@ import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "messages", indexes = [Index(name = "idx_chat_id_timestamp", columnList = "chat_id, timestamp DESC")])
+@Table(
+    name = "messages",
+    indexes = [
+        Index(name = "idx_chat_id_timestamp", columnList = "chat_id, timestamp DESC"),
+        Index(name = "idx_sender_id", columnList = "sender_id")
+    ]
+)
 class MessageEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

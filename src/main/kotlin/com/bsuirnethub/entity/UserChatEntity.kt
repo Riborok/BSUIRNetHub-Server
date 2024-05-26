@@ -3,7 +3,10 @@ package com.bsuirnethub.entity
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "user_chats")
+@Table(name = "user_chats", indexes = [
+    Index(name = "idx_user_id", columnList = "user_id"),
+    Index(name = "idx_chat_id", columnList = "chat_id")
+])
 class UserChatEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

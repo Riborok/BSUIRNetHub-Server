@@ -1,5 +1,7 @@
 package com.bsuirnethub
 
+import com.bsuirnethub.exception.RestStatusException
+import com.bsuirnethub.repository.SubscriptionRepository
 import com.bsuirnethub.repository.UserRepository
 import com.bsuirnethub.service.SubscriptionService
 import com.bsuirnethub.service.UserService
@@ -7,12 +9,14 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
 class SubscriptionServiceTest (
     @Autowired private val userRepository: UserRepository,
+    @Autowired private val subscriptionRepository: SubscriptionRepository,
     @Autowired private val userService: UserService,
     @Autowired private val subscriptionService: SubscriptionService
 ) {
@@ -33,10 +37,10 @@ class SubscriptionServiceTest (
         userService.createUser(userId1)
         userService.createUser(userId2)
         subscriptionService.addSubscription(userId1, userId2)
-        val user1 = userService.getUserInfo(userId1)
-        val user2 = userService.getUserInfo(userId2)
-        assertEquals(1, user1.subscriptionIds!!.size)
-        assertEquals(1, user2.subscriberIds!!.size)
+        val user1SubscriptionIds = subscriptionService.getSubscriptionIds(userId1)
+        val user2SubscriberIds = subscriptionService.getSubscriberIds(userId2)
+        assertEquals(1, user1SubscriptionIds.size)
+        assertEquals(1, user2SubscriberIds.size)
     }
 
     @Test
@@ -45,12 +49,10 @@ class SubscriptionServiceTest (
         val userId2 = "user2"
         userService.createUser(userId1)
         userService.createUser(userId2)
-        for (i in 1..42)
+        subscriptionService.addSubscription(userId1, userId2)
+        assertThrows<RestStatusException> {
             subscriptionService.addSubscription(userId1, userId2)
-        val user1 = userService.getUserInfo(userId1)
-        val user2 = userService.getUserInfo(userId2)
-        assertEquals(1, user1.subscriptionIds!!.size)
-        assertEquals(1, user2.subscriberIds!!.size)
+        }
     }
 
     @Test
@@ -61,10 +63,21 @@ class SubscriptionServiceTest (
         userService.createUser(userId2)
         subscriptionService.addSubscription(userId1, userId2)
         subscriptionService.deleteSubscription(userId1, userId2)
-        val user1 = userService.getUserInfo(userId1)
-        val user2 = userService.getUserInfo(userId2)
-        assertEquals(0, user1.subscriptionIds!!.size)
-        assertEquals(0, user2.subscriberIds!!.size)
+        val user1SubscriptionIds = subscriptionService.getSubscriptionIds(userId1)
+        val user2SubscriberIds = subscriptionService.getSubscriberIds(userId2)
+        assertEquals(0, user1SubscriptionIds.size)
+        assertEquals(0, user2SubscriberIds.size)
+    }
+
+    @Test
+    fun `test deleteSubscription with non-existent subscription`() {
+        val userId1 = "user1"
+        val userId2 = "user2"
+        userService.createUser(userId1)
+        userService.createUser(userId2)
+        assertThrows<RestStatusException> {
+            subscriptionService.deleteSubscription(userId1, userId2)
+        }
     }
 
     @Test
@@ -76,7 +89,7 @@ class SubscriptionServiceTest (
         subscriptionService.addSubscription(userId1, userId2)
         val subscriptions = subscriptionService.getSubscriptionIds(userId1)
         assertEquals(1, subscriptions.size)
-        assertEquals(userId2, subscriptions[0].userId)
+        assertEquals(userId2, subscriptions[0])
     }
 
     @Test
@@ -88,7 +101,7 @@ class SubscriptionServiceTest (
         subscriptionService.addSubscription(userId1, userId2)
         val subscribers = subscriptionService.getSubscriberIds(userId2)
         assertEquals(1, subscribers.size)
-        assertEquals(userId1, subscribers[0].userId)
+        assertEquals(userId1, subscribers[0])
     }
 
     @Test
@@ -104,5 +117,6 @@ class SubscriptionServiceTest (
         val subscriptions = subscriptionService.getSubscriptionIds(userId1)
         assertEquals(0, subscribers.size)
         assertEquals(0, subscriptions.size)
+        assertEquals(0, subscriptionRepository.count())
     }
 }

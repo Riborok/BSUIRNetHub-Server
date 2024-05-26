@@ -19,7 +19,7 @@ class UserController(private val userService: UserService) {
 
     @GetMapping("/users")
     fun getUserIds(
-    ): ResponseEntity<List<User>> {
+    ): ResponseEntity<List<UserId?>> {
         return ResponseEntity.ok(userService.getUserIds())
     }
 }

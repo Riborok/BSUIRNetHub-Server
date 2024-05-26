@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 @ControllerAdvice
 class RestStatusExceptionHandler {
     @ExceptionHandler(RestStatusException::class)
-    fun handleRestStatusException(ex: RestStatusException): ResponseEntity<Any> {
+    fun handleRestStatusException(ex: RestStatusException): ResponseEntity<String?> {
         return ResponseEntity.status(ex.status).body(ex.message)
     }
 }
