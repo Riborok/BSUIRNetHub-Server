@@ -21,11 +21,11 @@ class UserEntity(
     @Column(name = "user_id")
     var userId: UserId? = null,
 
-    @OneToMany(mappedBy = "subscription", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    var subscribers: MutableList<SubscriptionEntity> = ArrayList(),
-
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var subscriptions: MutableList<SubscriptionEntity> = ArrayList(),
+
+    @OneToMany(mappedBy = "subscription", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var subscribers: MutableList<SubscriptionEntity> = ArrayList(),
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var userChats: MutableList<UserChatEntity> = ArrayList()
