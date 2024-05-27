@@ -3,7 +3,6 @@ package com.bsuirnethub.component.validator
 import com.bsuirnethub.alias.UserId
 import com.bsuirnethub.entity.UserEntity
 import com.bsuirnethub.exception.RestStatusException
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 
@@ -15,14 +14,10 @@ class UserValidator {
     }
 
     fun validateUserDoesNotExists(userId: UserId, operation: () -> UserId?): UserId? {
-        return try {
-            operation()
-        } catch (e: DataIntegrityViolationException) {
-            throw RestStatusException("User with id $userId already exists", HttpStatus.CONFLICT)
-        }
+        return validateEntityDoesNotExists(operation, "User with id $userId already exists")
     }
 
-    fun validateUserExist(chatEntity: UserEntity?, userId: String): UserEntity {
+    fun validateUserExist(chatEntity: UserEntity?, userId: UserId): UserEntity {
         return chatEntity ?: throw RestStatusException("User with id $userId not found", HttpStatus.NOT_FOUND)
     }
 

@@ -2,7 +2,6 @@ package com.bsuirnethub.component.validator
 
 import com.bsuirnethub.alias.UserId
 import com.bsuirnethub.exception.RestStatusException
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 
@@ -20,10 +19,6 @@ class SubscriptionValidator {
     }
 
     fun validateSubscriptionDoesNotExists(userId: UserId, subscriptionId: UserId, operation: () -> UserId?): UserId? {
-        return try {
-            operation()
-        } catch (e: DataIntegrityViolationException) {
-            throw RestStatusException("Subscription already exists for userId $userId and subscriptionId $subscriptionId", HttpStatus.CONFLICT)
-        }
+        return validateEntityDoesNotExists(operation, "Subscription already exists for userId $userId and subscriptionId $subscriptionId")
     }
 }
