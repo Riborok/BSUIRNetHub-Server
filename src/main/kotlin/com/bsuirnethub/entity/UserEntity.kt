@@ -28,5 +28,8 @@ class UserEntity(
     var subscribers: MutableList<SubscriptionEntity> = ArrayList(),
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    var userChats: MutableList<UserChatEntity> = ArrayList()
+    var userChats: MutableList<UserChatEntity> = ArrayList(),
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var groups: MutableList<GroupEntity> = ArrayList(),
 )
