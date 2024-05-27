@@ -1,5 +1,8 @@
 package com.bsuirnethub.exception
 
-import org.springframework.http.HttpStatus
+import com.bsuirnethub.exception.error_code.ErrorCode
 
-class RestStatusException(message: String, val status: HttpStatus) : RuntimeException(message)
+class RestStatusException(
+    val errorCode: ErrorCode,
+    val source: Any
+) : RuntimeException(errorCode.message)
