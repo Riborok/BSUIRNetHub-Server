@@ -9,7 +9,7 @@ class Chat(
 )
 
 fun ChatEntity.toModel(): Chat {
-    return Chat(id, participants.map { it.userId })
+    return Chat(id, userChats.map { it.user?.userId })
 }
 
 fun Collection<ChatEntity>.toModels(): List<Chat> {

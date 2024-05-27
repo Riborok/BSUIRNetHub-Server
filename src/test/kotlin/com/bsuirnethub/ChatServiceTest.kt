@@ -1,6 +1,7 @@
 package com.bsuirnethub
 
 import com.bsuirnethub.entity.ChatEntity
+import com.bsuirnethub.entity.UserChatEntity
 import com.bsuirnethub.entity.UserEntity
 import com.bsuirnethub.exception.RestStatusException
 import com.bsuirnethub.repository.ChatRepository
@@ -76,6 +77,7 @@ class ChatServiceTest(
         chatService.deleteChat(userId1, chat.id!!)
         assertEquals(0, chatRepository.count())
         assertEquals(0, userChatRepository.count())
+        assertEquals(2, userRepository.count())
     }
 
     @Test
@@ -143,8 +145,13 @@ class ChatServiceTest(
         val user1 = UserEntity(userId = userId1)
         val user2 = UserEntity(userId = userId2)
         userRepository.saveAll(listOf(user1, user2))
-        chatRepository.save(ChatEntity(participants = mutableSetOf(user1, user2)))
-        chatRepository.save(ChatEntity(participants = mutableSetOf(user1, user2)))
+        val chatEntity1 = ChatEntity().apply {
+            userChats.addAll(listOf(UserChatEntity(user = user1, chat = this), UserChatEntity(user = user2, chat = this)))
+        }
+        val chatEntity2 = ChatEntity().apply {
+            userChats.addAll(listOf(UserChatEntity(user = user1, chat = this), UserChatEntity(user = user2, chat = this)))
+        }
+        chatRepository.saveAll(listOf(chatEntity1, chatEntity2))
         assertThrows<RestStatusException> {
             chatService.getUniqueChat(userId2, listOf(userId1, userId2))
         }
@@ -170,6 +177,6 @@ class ChatServiceTest(
         userService.deleteUser(userId2)
         userService.deleteUser(userId3)
         assertEquals(0, userChatRepository.count())
-        assertEquals(7, chatRepository.count())
+        assertEquals(0, chatRepository.count())
     }
 }

@@ -5,6 +5,7 @@ import com.bsuirnethub.component.finder.ChatFinder
 import com.bsuirnethub.component.finder.UserFinder
 import com.bsuirnethub.component.validator.ChatValidator
 import com.bsuirnethub.entity.ChatEntity
+import com.bsuirnethub.entity.UserChatEntity
 import com.bsuirnethub.model.Chat
 import com.bsuirnethub.model.toModel
 import com.bsuirnethub.repository.ChatRepository
@@ -23,14 +24,15 @@ class ChatService(
         val userEntities = userFinder.findUserEntitiesByIdsOrThrow(participantIds).toMutableSet()
         val chatCount = chatFinder.getExistingChatCountByParticipantEntities(userEntities)
         chatValidator.validateChatDoesNotExist(chatCount, participantIds)
-        var chatEntity = ChatEntity(participants = userEntities)
+        var chatEntity = ChatEntity()
+        chatEntity.userChats.addAll(userEntities.map { UserChatEntity(user = it, chat = chatEntity) })
         chatEntity = chatRepository.save(chatEntity)
         return chatEntity.toModel()
     }
 
     fun deleteChat(senderId: UserId, chatId: Long) {
         val chatEntity = chatFinder.findChatEntityByIdOrThrow(chatId)
-        chatValidator.validateSenderIdInParticipants(senderId, chatEntity.participants.mapNotNull { it.userId })
+        chatValidator.validateSenderIdInParticipants(senderId, chatEntity.userChats.mapNotNull { it.user?.userId })
         chatRepository.delete(chatEntity)
     }
 
