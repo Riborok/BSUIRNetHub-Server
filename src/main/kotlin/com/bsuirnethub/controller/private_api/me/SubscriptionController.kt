@@ -10,9 +10,9 @@ import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("${ApiPaths.PRIVATE}/me")
+@RequestMapping("${ApiPaths.PRIVATE}/me/subscriptions")
 class SubscriptionController(private val subscriptionService: SubscriptionService) {
-    @PostMapping("/subscriptions/{subscriptionId}")
+    @PostMapping("/{subscriptionId}")
     fun addSubscription(
         @AuthenticationPrincipal jwt: Jwt,
         @PathVariable subscriptionId: UserId
@@ -22,7 +22,7 @@ class SubscriptionController(private val subscriptionService: SubscriptionServic
         return ResponseEntity.status(HttpStatus.CREATED).body(updatedUser)
     }
 
-    @DeleteMapping("/subscriptions/{subscriptionId}")
+    @DeleteMapping("/{subscriptionId}")
     fun deleteSubscription(
         @AuthenticationPrincipal jwt: Jwt,
         @PathVariable subscriptionId: UserId
@@ -32,19 +32,11 @@ class SubscriptionController(private val subscriptionService: SubscriptionServic
         return ResponseEntity.noContent().build()
     }
 
-    @GetMapping("/subscriptions")
+    @GetMapping
     fun getSubscriptionIds(
         @AuthenticationPrincipal jwt: Jwt
     ): ResponseEntity<List<UserId?>> {
         val myUserId = jwt.subject
         return ResponseEntity.ok(subscriptionService.getSubscriptionIds(myUserId))
-    }
-
-    @GetMapping("/subscribers")
-    fun getSubscriberIds(
-        @AuthenticationPrincipal jwt: Jwt
-    ): ResponseEntity<List<UserId?>> {
-        val myUserId = jwt.subject
-        return ResponseEntity.ok(subscriptionService.getSubscriberIds(myUserId))
     }
 }

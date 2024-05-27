@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("${ApiPaths.PRIVATE}/me")
-class UserJoinLeaveController(private val userService: UserService) {
-    @PostMapping("/join")
+class JoinLeaveController(private val userService: UserService) {
+    @PostMapping
     fun createUser(
         @AuthenticationPrincipal jwt: Jwt
     ): ResponseEntity<UserId?> {
@@ -21,7 +21,7 @@ class UserJoinLeaveController(private val userService: UserService) {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser)
     }
 
-    @DeleteMapping("/quit")
+    @DeleteMapping
     fun deleteUser(
         @AuthenticationPrincipal jwt: Jwt
     ): ResponseEntity<Unit> {
