@@ -32,4 +32,7 @@ class UserEntity(
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var groups: MutableList<GroupEntity> = ArrayList(),
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    var teachers: MutableList<TeacherEntity> = ArrayList()
 )

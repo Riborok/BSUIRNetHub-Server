@@ -38,9 +38,9 @@ class GroupServiceTest(
         val groupId = "group"
         userService.createUser(userId)
         groupService.addGroup(userId, groupId)
-        val groups = groupService.getGroupIds(userId)
-        assertEquals(1, groups.size)
-        assertEquals(groupId, groups[0])
+        val groupIds = groupService.getGroupIds(userId)
+        assertEquals(1, groupIds.size)
+        assertEquals(groupId, groupIds[0])
     }
 
     @Test
