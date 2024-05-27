@@ -11,6 +11,9 @@ import jakarta.persistence.*
             name = "uk_teacher_user",
             columnNames = ["teacher_id", "user_id"]
         )
+    ],
+    indexes = [
+        Index(name = "idx_user_id", columnList = "user_id")
     ]
 )
 class TeacherEntity(

@@ -11,6 +11,9 @@ import jakarta.persistence.*
             name = "uk_group_user",
             columnNames = ["group_id", "user_id"]
         )
+    ],
+    indexes = [
+        Index(name = "idx_user_id", columnList = "user_id")
     ]
 )
 class GroupEntity(
