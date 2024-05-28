@@ -43,4 +43,9 @@ class ChatService(
         val chatEntity = chatFinder.findSingleChatEntityByParticipantEntitiesOrThrow(userEntities)
         return chatEntity.toModel()
     }
+
+    fun getChats(userId: UserId): List<Chat?> {
+        val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
+        return userEntity.userChats.map { it.chat?.toModel() }
+    }
 }

@@ -47,7 +47,7 @@ class ChatServiceTest(
         val user2 = UserEntity(userId = userId2)
         userRepository.saveAll(listOf(user1, user2))
         val chat = chatService.createUniqueChat(listOf(userId1, userId2))
-        assertEquals(2, chat.participantIds!!.size)
+        assertEquals(2, chat.userChats!!.size)
     }
 
     @Test
@@ -167,6 +167,26 @@ class ChatServiceTest(
         assertThrows<RestStatusException> {
             chatService.getUniqueChat(userId2, listOf(userId1, userId2))
         }
+    }
+
+    @Test
+    fun `test getChats`() {
+        val userId1 = "user1"
+        val userId2 = "user2"
+        val user1 = UserEntity(userId = userId1)
+        val user2 = UserEntity(userId = userId2)
+        userRepository.saveAll(listOf(user1, user2))
+        val chat1 = chatService.createUniqueChat(listOf(userId1, userId2))
+        val chat2 = chatService.createUniqueChat(listOf(userId1))
+        val chat3 = chatService.createUniqueChat(listOf(userId2))
+        val chatIds1 = chatService.getChats(userId1).map { it?.id }
+        val chatIds2 = chatService.getChats(userId2).map { it?.id }
+        assertEquals(2, chatIds1.size)
+        assertEquals(2, chatIds2.size)
+        assertTrue(chatIds1.contains(chat1.id))
+        assertTrue(chatIds1.contains(chat2.id))
+        assertTrue(chatIds2.contains(chat1.id))
+        assertTrue(chatIds2.contains(chat3.id))
     }
 
     @Test

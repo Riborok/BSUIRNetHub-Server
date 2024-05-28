@@ -1,15 +1,14 @@
 package com.bsuirnethub.model
 
-import com.bsuirnethub.alias.UserId
 import com.bsuirnethub.entity.ChatEntity
 
 class Chat(
     var id: Long?,
-    var participantIds: List<UserId?>?
+    var userChats: List<UserChat>?
 )
 
 fun ChatEntity.toModel(): Chat {
-    return Chat(id, userChats.map { it.user?.userId })
+    return Chat(id, userChats.toModels())
 }
 
 fun Collection<ChatEntity>.toModels(): List<Chat> {

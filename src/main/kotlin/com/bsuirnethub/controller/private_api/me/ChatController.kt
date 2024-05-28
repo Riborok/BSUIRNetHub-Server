@@ -23,6 +23,16 @@ class ChatController(private val chatService: ChatService) {
         return ResponseEntity.status(HttpStatus.CREATED).body(chat)
     }
 
+    @GetMapping("/with/{userId}")
+    fun getUniqueChat(
+        @AuthenticationPrincipal jwt: Jwt,
+        @PathVariable userId: UserId
+    ): ResponseEntity<Chat> {
+        val myUserId = jwt.subject
+        val chat = chatService.getUniqueChat(myUserId, listOf(myUserId, userId))
+        return ResponseEntity.ok(chat)
+    }
+
     @DeleteMapping("/{chatId}")
     fun deleteChat(
         @AuthenticationPrincipal jwt: Jwt,
@@ -33,13 +43,12 @@ class ChatController(private val chatService: ChatService) {
         return ResponseEntity.noContent().build()
     }
 
-    @GetMapping("/with/{userId}")
-    fun getUniqueChat(
-        @AuthenticationPrincipal jwt: Jwt,
-        @PathVariable userId: UserId
-    ): ResponseEntity<Chat> {
+    @GetMapping
+    fun getChats(
+        @AuthenticationPrincipal jwt: Jwt
+    ): ResponseEntity<List<Chat?>> {
         val myUserId = jwt.subject
-        val chat = chatService.getUniqueChat(myUserId, listOf(myUserId, userId))
+        val chat = chatService.getChats(myUserId)
         return ResponseEntity.ok(chat)
     }
 }
