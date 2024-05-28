@@ -18,5 +18,5 @@ interface ChatRepository : JpaRepository<ChatEntity, Long> {
         HAVING COUNT(DISTINCT uc.user) = :size AND
                COUNT(DISTINCT uc.user) = (SELECT COUNT(DISTINCT user) FROM UserChatEntity WHERE chat = c)
     """)
-    fun findByParticipants(@Param("participants") participants: Set<UserEntity>, @Param("size") size: Long): List<ChatEntity>
+    fun findByParticipants(@Param("participants") participants: List<UserEntity>, @Param("size") size: Long): List<ChatEntity>
 }

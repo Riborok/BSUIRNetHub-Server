@@ -15,17 +15,17 @@ class ChatFinder(
         return chatValidator.validateChatExist(chatRepository.findById(chatId).orElse(null), chatId)
     }
 
-    fun getExistingChatCountByParticipantEntities(participantEntities: Set<UserEntity>): Int {
+    fun getExistingChatCountByParticipantEntities(participantEntities: List<UserEntity>): Int {
         val chatEntities = chatRepository.findByParticipants(participantEntities, participantEntities.size.toLong())
         return chatEntities.size
     }
 
-    fun findSingleChatEntityByParticipantEntitiesOrThrow(participantEntities: Set<UserEntity>): ChatEntity {
+    fun findSingleChatEntityByParticipantEntitiesOrThrow(participantEntities: List<UserEntity>): ChatEntity {
         val chatEntities = chatRepository.findByParticipants(participantEntities, participantEntities.size.toLong())
         return getSingleChatEntityOrThrow(chatEntities, participantEntities)
     }
 
-    private fun getSingleChatEntityOrThrow(chatEntities: List<ChatEntity>, participantEntities: Set<UserEntity>): ChatEntity {
+    private fun getSingleChatEntityOrThrow(chatEntities: List<ChatEntity>, participantEntities: List<UserEntity>): ChatEntity {
         chatValidator.validateSingleChatEntity(chatEntities, participantEntities)
         return chatEntities[0]
     }

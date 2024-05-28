@@ -18,10 +18,9 @@ class UserService(
     private val userValidator: UserValidator,
 ) {
     fun createUser(userId: UserId): UserId? {
-        var userEntity = UserEntity(userId = userId)
+        val userEntity = UserEntity(userId = userId)
         return userValidator.validateUserDoesNotExists(userId) {
-            userEntity = userRepository.save(userEntity)
-            userEntity.userId
+            userRepository.save(userEntity).userId
         }
     }
 

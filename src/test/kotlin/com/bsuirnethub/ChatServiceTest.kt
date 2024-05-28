@@ -67,6 +67,18 @@ class ChatServiceTest(
     }
 
     @Test
+    fun `test createUniqueChat With Duplicates Users`() {
+        val userId1 = "user1"
+        val userId2 = "user2"
+        val user1 = UserEntity(userId = userId1)
+        val user2 = UserEntity(userId = userId2)
+        userRepository.saveAll(listOf(user1, user2))
+        assertThrows<RestStatusException> {
+            chatService.createUniqueChat(listOf(userId1, userId2, userId1))
+        }
+    }
+
+    @Test
     fun `test deleteChat`() {
         val userId1 = "user1"
         val userId2 = "user2"

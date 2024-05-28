@@ -10,7 +10,7 @@ class ChatEntity(
     var id: Long? = null,
 
     @OneToMany(mappedBy = "chat", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-    var userChats: MutableSet<UserChatEntity> = HashSet(),
+    var userChats: MutableList<UserChatEntity> = ArrayList(),
 
     @OneToMany(mappedBy = "chat", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     @OrderBy("timestamp DESC")

@@ -6,9 +6,12 @@ import com.bsuirnethub.component.finder.UserFinder
 import com.bsuirnethub.component.validator.ChatValidator
 import com.bsuirnethub.entity.ChatEntity
 import com.bsuirnethub.entity.UserChatEntity
+import com.bsuirnethub.exception.RestStatusException
+import com.bsuirnethub.exception.error_code.ChatErrorCode
 import com.bsuirnethub.model.Chat
 import com.bsuirnethub.model.toModel
 import com.bsuirnethub.repository.ChatRepository
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -21,13 +24,14 @@ class ChatService(
     private val chatValidator: ChatValidator
 ) {
     fun createUniqueChat(participantIds: List<UserId>): Chat {
-        val userEntities = userFinder.findUserEntitiesByIdsOrThrow(participantIds).toMutableSet()
+        val userEntities = userFinder.findUserEntitiesByIdsOrThrow(participantIds)
         val chatCount = chatFinder.getExistingChatCountByParticipantEntities(userEntities)
         chatValidator.validateChatDoesNotExist(chatCount, participantIds)
-        var chatEntity = ChatEntity()
+        val chatEntity = ChatEntity()
         chatEntity.userChats.addAll(userEntities.map { UserChatEntity(user = it, chat = chatEntity) })
-        chatEntity = chatRepository.save(chatEntity)
-        return chatEntity.toModel()
+        return chatValidator.validateParticipantsUniqueness(participantIds) {
+            chatRepository.save(chatEntity).toModel()
+        }
     }
 
     fun deleteChat(senderId: UserId, chatId: Long) {
@@ -38,7 +42,7 @@ class ChatService(
 
     fun getUniqueChat(senderId: UserId, participantIds: List<UserId>): Chat {
         chatValidator.validateSenderIdInParticipants(senderId, participantIds)
-        val userEntities = userFinder.findUserEntitiesByIdsOrThrow(participantIds).toSet()
+        val userEntities = userFinder.findUserEntitiesByIdsOrThrow(participantIds)
         val chatEntity = chatFinder.findSingleChatEntityByParticipantEntitiesOrThrow(userEntities)
         return chatEntity.toModel()
     }

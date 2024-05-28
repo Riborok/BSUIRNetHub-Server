@@ -3,7 +3,14 @@ package com.bsuirnethub.entity
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "user_chats", indexes = [
+@Table(name = "user_chats",
+    uniqueConstraints = [
+        UniqueConstraint(
+            name = "uk_chat_user",
+            columnNames = ["chat_id", "user_id"]
+        )
+    ],
+    indexes = [
     Index(name = "idx_user_id", columnList = "user_id"),
     Index(name = "idx_chat_id", columnList = "chat_id")
 ])

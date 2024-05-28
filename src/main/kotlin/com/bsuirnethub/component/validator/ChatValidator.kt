@@ -5,6 +5,7 @@ import com.bsuirnethub.entity.ChatEntity
 import com.bsuirnethub.entity.UserEntity
 import com.bsuirnethub.exception.RestStatusException
 import com.bsuirnethub.exception.error_code.ChatErrorCode
+import com.bsuirnethub.model.Chat
 import org.springframework.stereotype.Component
 
 @Component
@@ -23,10 +24,14 @@ class ChatValidator {
         return chatEntity ?: throw RestStatusException(ChatErrorCode.CHAT_NOT_FOUND, chatId)
     }
 
-    fun validateSingleChatEntity(chatEntities: List<ChatEntity>, participantEntities: Set<UserEntity>) {
+    fun validateSingleChatEntity(chatEntities: List<ChatEntity>, participantEntities: List<UserEntity>) {
         if (chatEntities.isEmpty())
             throw RestStatusException(ChatErrorCode.CHAT_NOT_FOUND, participantEntities.map { it.userId })
         if (chatEntities.size > 1)
             throw RestStatusException(ChatErrorCode.MULTIPLE_CHATS_FOUND, participantEntities.map { it.userId })
+    }
+
+    fun validateParticipantsUniqueness(participantIds: List<UserId>, operation: () -> Chat): Chat {
+        return validateEntityDoesNotExists(operation, ChatErrorCode.DUPLICATE_PARTICIPANTS, participantIds)
     }
 }
