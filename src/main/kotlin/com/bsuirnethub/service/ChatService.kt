@@ -6,12 +6,9 @@ import com.bsuirnethub.component.finder.UserFinder
 import com.bsuirnethub.component.validator.ChatValidator
 import com.bsuirnethub.entity.ChatEntity
 import com.bsuirnethub.entity.UserChatEntity
-import com.bsuirnethub.exception.RestStatusException
-import com.bsuirnethub.exception.error_code.ChatErrorCode
 import com.bsuirnethub.model.Chat
 import com.bsuirnethub.model.toModel
 import com.bsuirnethub.repository.ChatRepository
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
