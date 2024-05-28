@@ -6,7 +6,7 @@ import com.bsuirnethub.entity.UserChatEntity
 class UserChat(
     var chatId: Long?,
     var userId: UserId?,
-    var unreadMessages: Int?
+    var unreadMessages: Int
 )
 
 fun UserChatEntity.toModel(): UserChat {

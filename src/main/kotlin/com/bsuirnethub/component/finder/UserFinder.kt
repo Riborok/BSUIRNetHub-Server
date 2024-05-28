@@ -16,9 +16,9 @@ class UserFinder(
     }
 
     fun findUserEntitiesByIdsOrThrow(userIds: List<UserId>): List<UserEntity> {
-        val users = findExistingUserEntitiesByIds(userIds)
-        userValidator.validateAllUserEntitiesExistence(userIds, users)
-        return users
+        val userEntities = findExistingUserEntitiesByIds(userIds)
+        userValidator.validateAllUserEntitiesExistence(userIds, userEntities)
+        return userEntities
     }
 
     private fun findExistingUserEntitiesByIds(userIds: List<UserId>): List<UserEntity> {

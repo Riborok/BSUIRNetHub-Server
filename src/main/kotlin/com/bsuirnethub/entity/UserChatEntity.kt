@@ -28,9 +28,5 @@ class UserChatEntity(
     var chat: ChatEntity? = null,
 
     @Column(name = "unread_messages")
-    private var _unreadMessages: Int? = 0
-) {
-    var unreadMessages: Int
-        get() = _unreadMessages ?: 0
-        set(value) { _unreadMessages = value }
-}
+    var unreadMessages: Int = 0
+)
