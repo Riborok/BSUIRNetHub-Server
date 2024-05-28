@@ -37,9 +37,4 @@ class SubscriptionService(
         val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
         return userEntity.subscriptions.map { it.subscription?.userId }
     }
-
-    fun getSubscriberIds(userId: UserId): List<UserId?> {
-        val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
-        return userEntity.subscribers.map { it.user?.userId }
-    }
 }
