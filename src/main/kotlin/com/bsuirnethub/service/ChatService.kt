@@ -6,6 +6,7 @@ import com.bsuirnethub.component.finder.UserFinder
 import com.bsuirnethub.component.validator.ChatValidator
 import com.bsuirnethub.entity.ChatEntity
 import com.bsuirnethub.entity.UserChatEntity
+import com.bsuirnethub.entity.UserEntity
 import com.bsuirnethub.model.Chat
 import com.bsuirnethub.model.toModel
 import com.bsuirnethub.repository.ChatRepository
@@ -22,13 +23,24 @@ class ChatService(
 ) {
     fun createUniqueChat(participantIds: List<UserId>): Chat {
         val userEntities = userFinder.findUserEntitiesByIdsOrThrow(participantIds)
+        validateChatDoesNotExist(userEntities, participantIds)
+        val chatEntity = createChatEntity(userEntities)
+        return chatValidator.validateParticipantsUniqueness(participantIds) {
+            val savedChatEntity = chatRepository.save(chatEntity)
+            savedChatEntity.toModel()
+        }
+    }
+
+    private fun validateChatDoesNotExist(userEntities: List<UserEntity>, participantIds: List<UserId>) {
         val chatCount = chatFinder.getExistingChatCountByParticipantEntities(userEntities)
         chatValidator.validateChatDoesNotExist(chatCount, participantIds)
+    }
+
+    private fun createChatEntity(userEntities: List<UserEntity>): ChatEntity {
         val chatEntity = ChatEntity()
-        chatEntity.userChats.addAll(userEntities.map { UserChatEntity(user = it, chat = chatEntity) })
-        return chatValidator.validateParticipantsUniqueness(participantIds) {
-            chatRepository.save(chatEntity).toModel()
-        }
+        val userChatEntities = userEntities.map { UserChatEntity(user = it, chat = chatEntity) }
+        chatEntity.userChats.addAll(userChatEntities)
+        return chatEntity
     }
 
     fun deleteChat(senderId: UserId, chatId: Long) {
@@ -46,6 +58,7 @@ class ChatService(
 
     fun getChats(userId: UserId): List<Chat?> {
         val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
-        return userEntity.userChats.map { it.chat?.toModel() }
+        val userChatEntities = userEntity.userChats
+        return userChatEntities.map { it.chat?.toModel() }
     }
 }

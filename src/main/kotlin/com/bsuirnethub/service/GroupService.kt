@@ -20,7 +20,8 @@ class GroupService(
         val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
         val groupEntity = GroupEntity(groupId = groupId, user = userEntity)
         return groupValidator.validateGroupDoesNotExists(userId, groupId) {
-            groupRepository.save(groupEntity).groupId
+            val savedGroupEntity = groupRepository.save(groupEntity)
+            savedGroupEntity.groupId
         }
     }
 
@@ -32,6 +33,7 @@ class GroupService(
 
     fun getGroupIds(userId: UserId): List<GroupId?> {
         val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
-        return userEntity.groups.map { it.groupId }
+        val groupEntities = userEntity.groups
+        return groupEntities.map { it.groupId }
     }
 }

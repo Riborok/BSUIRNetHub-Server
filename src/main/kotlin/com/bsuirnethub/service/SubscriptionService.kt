@@ -16,13 +16,20 @@ class SubscriptionService(
     private val subscriptionValidator: SubscriptionValidator
 ) {
     fun addSubscription(userId: UserId, subscriptionId: UserId): UserId? {
-        val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
         subscriptionValidator.validateUserIsNotSubscription(userId, subscriptionId)
-        val subscriptionUserEntity = userFinder.findUserEntityByIdOrThrow(subscriptionId)
+        val subscriptionEntity = createSubscriptionEntity(userId, subscriptionId)
         return subscriptionValidator.validateSubscriptionDoesNotExists(userId, subscriptionId) {
-            val subscriptionEntity = SubscriptionEntity(user = userEntity, subscription = subscriptionUserEntity)
-            subscriptionRepository.save(subscriptionEntity).subscription?.userId
+            val savedSubscriptionEntity = subscriptionRepository.save(subscriptionEntity)
+            val savedSubscriptionUserEntity = savedSubscriptionEntity.subscription
+            savedSubscriptionUserEntity?.userId
         }
+    }
+
+    private fun createSubscriptionEntity(userId: UserId, subscriptionId: UserId): SubscriptionEntity {
+        val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
+        val subscriptionUserEntity = userFinder.findUserEntityByIdOrThrow(subscriptionId)
+        val subscriptionEntity = SubscriptionEntity(user = userEntity, subscription = subscriptionUserEntity)
+        return subscriptionEntity
     }
 
     fun deleteSubscription(userId: UserId, subscriptionId: UserId) {
@@ -34,6 +41,7 @@ class SubscriptionService(
 
     fun getSubscriptionIds(userId: UserId): List<UserId?> {
         val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
-        return userEntity.subscriptions.map { it.subscription?.userId }
+        val subscriptionEntities = userEntity.subscriptions
+        return subscriptionEntities.map { it.subscription?.userId }
     }
 }

@@ -6,6 +6,8 @@ import com.bsuirnethub.component.finder.UserChatFinder
 import com.bsuirnethub.component.finder.UserFinder
 import com.bsuirnethub.component.validator.ChatValidator
 import com.bsuirnethub.component.validator.UserChatValidator
+import com.bsuirnethub.entity.ChatEntity
+import com.bsuirnethub.entity.UserChatEntity
 import com.bsuirnethub.model.Chat
 import com.bsuirnethub.model.UserChat
 import com.bsuirnethub.model.toModel
@@ -29,18 +31,29 @@ class UserChatService(
         userChatValidator.validateMessageCountNonNegative(messageCount)
         val chatEntity = chatFinder.findChatEntityByIdOrThrow(chatId)
         chatValidator.validateSenderIdInParticipants(senderId, chatEntity)
+        incrementUnreadMessagesExcludingSender(chatEntity, senderId, messageCount)
+        val savedChatEntity = chatRepository.save(chatEntity)
+        return savedChatEntity.toModel()
+    }
+
+    private fun incrementUnreadMessagesExcludingSender(chatEntity: ChatEntity, senderId: UserId, messageCount: Int) {
         chatEntity.userChats
-            .filter  { it.user?.userId != senderId }
+            .filter { it.user?.userId != senderId }
             .forEach { it.unreadMessages += messageCount }
-        return chatRepository.save(chatEntity).toModel()
     }
 
     fun markMessagesAsRead(senderId: UserId, chatId: Long, messageCount: Int): UserChat {
         userChatValidator.validateMessageCountNonNegative(messageCount)
-        val sender = userFinder.findUserEntityByIdOrThrow(senderId)
-        val chat = chatFinder.findChatEntityByIdOrThrow(chatId)
-        val userChat = userChatFinder.findUserChatEntityByUserEntityAndChatEntityOrThrow(sender, chat)
-        userChat.unreadMessages -= messageCount.coerceAtMost(userChat.unreadMessages)
-        return userChatRepository.save(userChat).toModel()
+        val userChatEntity = findUserChatEntity(senderId, chatId)
+        userChatEntity.unreadMessages -= messageCount.coerceAtMost(userChatEntity.unreadMessages)
+        val savedUserChatEntity = userChatRepository.save(userChatEntity)
+        return savedUserChatEntity.toModel()
+    }
+
+    private fun findUserChatEntity(senderId: UserId, chatId: Long): UserChatEntity {
+        val senderEntity = userFinder.findUserEntityByIdOrThrow(senderId)
+        val chatEntity = chatFinder.findChatEntityByIdOrThrow(chatId)
+        val userChatEntity = userChatFinder.findUserChatEntityByUserEntityAndChatEntityOrThrow(senderEntity, chatEntity)
+        return userChatEntity
     }
 }

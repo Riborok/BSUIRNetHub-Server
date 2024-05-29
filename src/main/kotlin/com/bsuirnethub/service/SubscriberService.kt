@@ -12,6 +12,7 @@ class SubscriberService(
 ) {
     fun getSubscriberIds(userId: UserId): List<UserId?> {
         val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
-        return userEntity.subscribers.map { it.user?.userId }
+        val subscriberEntities = userEntity.subscribers
+        return subscriberEntities.map { it.user?.userId }
     }
 }

@@ -20,7 +20,8 @@ class TeacherService(
         val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
         val teacherEntity = TeacherEntity(teacherId = teacherId, user = userEntity)
         return teacherValidator.validateTeacherDoesNotExists(userId, teacherId) {
-            teacherRepository.save(teacherEntity).teacherId
+            val savedTeacherEntity = teacherRepository.save(teacherEntity)
+            savedTeacherEntity.teacherId
         }
     }
 
@@ -32,6 +33,7 @@ class TeacherService(
 
     fun getTeacherIds(userId: UserId): List<TeacherId?> {
         val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
-        return userEntity.teachers.map { it.teacherId }
+        val teacherEntities = userEntity.teachers
+        return teacherEntities.map { it.teacherId }
     }
 }
