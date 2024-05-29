@@ -17,14 +17,14 @@ class UserValidator {
         return validateEntityDoesNotExists(operation, UserErrorCode.USER_ALREADY_EXISTS, userId)
     }
 
-    fun validateUserExist(chatEntity: UserEntity?, userId: UserId): UserEntity {
-        return chatEntity ?: throw RestStatusException(UserErrorCode.USER_NOT_FOUND, userId)
+    fun validateUserExist(userEntity: UserEntity?, userId: UserId): UserEntity {
+        return userEntity ?: throw RestStatusException(UserErrorCode.USER_NOT_FOUND, userId)
     }
 
-    fun validateAllUserEntitiesExistence(userIds: List<UserId>, users: List<UserEntity>) {
-        if (users.size != userIds.size) {
+    fun validateAllUserEntitiesExistence(userIds: List<UserId>, userEntities: List<UserEntity>) {
+        if (userEntities.size != userIds.size) {
             val missingUsers = userIds.filterNot { userId ->
-                users.any { user -> user.userId == userId }
+                userEntities.any { user -> user.userId == userId }
             }
             throw RestStatusException(UserErrorCode.USERS_NOT_FOUND, missingUsers)
         }

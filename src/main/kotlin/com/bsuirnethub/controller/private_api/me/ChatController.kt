@@ -33,6 +33,17 @@ class ChatController(private val chatService: ChatService) {
         return ResponseEntity.ok(chat)
     }
 
+    @PutMapping("/{chatId}/read")
+    fun markMessagesAsRead(
+        @AuthenticationPrincipal jwt: Jwt,
+        @PathVariable chatId: Long,
+        @RequestParam messageCount: Int
+    ): ResponseEntity<Chat> {
+        val myUserId = jwt.subject
+        val chat = chatService.markMessagesAsRead(myUserId, chatId, messageCount)
+        return ResponseEntity.ok(chat)
+    }
+
     @DeleteMapping("/{chatId}")
     fun deleteChat(
         @AuthenticationPrincipal jwt: Jwt,

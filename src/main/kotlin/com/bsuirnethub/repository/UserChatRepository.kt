@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface UserChatRepository : JpaRepository<UserChatEntity, Long> {
-    fun findByUserAndChat(user: UserEntity, chat: ChatEntity): UserChatEntity
+    fun findByUserAndChat(user: UserEntity, chat: ChatEntity): UserChatEntity?
 }

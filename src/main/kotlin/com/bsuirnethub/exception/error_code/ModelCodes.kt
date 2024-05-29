@@ -6,4 +6,5 @@ internal object ModelCodes {
     const val TEACHER = 30000
     const val SUBSCRIPTION = 40000
     const val CHAT = 50000
+    const val USER_CHAT = 60000
 }
