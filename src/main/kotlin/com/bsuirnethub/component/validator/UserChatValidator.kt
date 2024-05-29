@@ -10,4 +10,9 @@ class UserChatValidator {
     fun validateUserChatExist(userChatEntity: UserChatEntity?, chatId: Long?): UserChatEntity {
         return userChatEntity ?: throw RestStatusException(UserChatErrorCode.USER_CHAT_NOT_FOUND, chatId)
     }
+
+    fun validateMessageCountNonNegative(messageCount: Int) {
+        if (messageCount < 0)
+            throw RestStatusException(UserChatErrorCode.INVALID_MESSAGE_COUNT, messageCount)
+    }
 }
