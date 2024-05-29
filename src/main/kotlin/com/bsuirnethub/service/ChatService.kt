@@ -37,7 +37,7 @@ class ChatService(
 
     fun deleteChat(senderId: UserId, chatId: Long) {
         val chatEntity = chatFinder.findChatEntityByIdOrThrow(chatId)
-        chatValidator.validateSenderIdInParticipants(senderId, chatEntity.userChats.mapNotNull { it.user?.userId })
+        chatValidator.validateSenderIdInParticipants(senderId, chatEntity)
         chatRepository.delete(chatEntity)
     }
 
@@ -60,5 +60,16 @@ class ChatService(
         userChat.unreadMessages -= messageCount.coerceAtMost(userChat.unreadMessages)
         userChatRepository.save(userChat)
         return chat.toModel()
+    }
+
+    fun incrementUnreadMessagesForRecipients(senderId: UserId, chatId: Long): Chat {
+        val chatEntity = chatFinder.findChatEntityByIdOrThrow(chatId)
+        chatValidator.validateSenderIdInParticipants(senderId, chatEntity)
+        chatEntity.userChats.forEach {
+            if (it.user?.userId != senderId)
+                it.unreadMessages += 1
+        }
+        userChatRepository.saveAll(chatEntity.userChats)
+        return chatEntity.toModel()
     }
 }

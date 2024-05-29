@@ -15,8 +15,12 @@ class ChatValidator {
             throw RestStatusException(ChatErrorCode.CHAT_ALREADY_EXISTS, userIds)
     }
 
+    fun validateSenderIdInParticipants(senderId: UserId, chatEntity: ChatEntity) {
+        validateSenderIdInParticipants(senderId, chatEntity.userChats.mapNotNull { it.user?.userId })
+    }
+
     fun validateSenderIdInParticipants(senderId: UserId, participantIds: List<UserId>) {
-        if (!participantIds.any { it == senderId })
+        if (senderId !in participantIds)
             throw RestStatusException(ChatErrorCode.SENDER_NOT_FOUND_IN_PARTICIPANTS, senderId)
     }
 
