@@ -1,4 +1,4 @@
-package com.bsuirnethub.controller.private_api.me
+package com.bsuirnethub.controller.private_api.me.chats
 
 import com.bsuirnethub.ApiPaths
 import com.bsuirnethub.alias.UserId
@@ -30,17 +30,6 @@ class ChatController(private val chatService: ChatService) {
     ): ResponseEntity<Chat> {
         val myUserId = jwt.subject
         val chat = chatService.getUniqueChat(myUserId, listOf(myUserId, userId))
-        return ResponseEntity.ok(chat)
-    }
-
-    @PutMapping("/{chatId}/read")
-    fun markMessagesAsRead(
-        @AuthenticationPrincipal jwt: Jwt,
-        @PathVariable chatId: Long,
-        @RequestParam messageCount: Int
-    ): ResponseEntity<Chat> {
-        val myUserId = jwt.subject
-        val chat = chatService.markMessagesAsRead(myUserId, chatId, messageCount)
         return ResponseEntity.ok(chat)
     }
 

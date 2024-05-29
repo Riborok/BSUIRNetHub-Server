@@ -21,8 +21,7 @@ class SubscriptionService(
         val subscriptionUserEntity = userFinder.findUserEntityByIdOrThrow(subscriptionId)
         return subscriptionValidator.validateSubscriptionDoesNotExists(userId, subscriptionId) {
             val subscriptionEntity = SubscriptionEntity(user = userEntity, subscription = subscriptionUserEntity)
-            subscriptionRepository.save(subscriptionEntity)
-            subscriptionUserEntity.userId
+            subscriptionRepository.save(subscriptionEntity).subscription?.userId
         }
     }
 
