@@ -16,7 +16,7 @@ class UserInitializer(
         private set
 
     fun createAndSaveUsers(count: Int): UserInitializer {
-        userIds = (1..count).map{ "user$it" }
+        userIds = (0 until count).map{ "user$it" }
         userUserEntities = userIds.map { UserEntity(userId = it) }
         userRepository.saveAll(userUserEntities)
         return this

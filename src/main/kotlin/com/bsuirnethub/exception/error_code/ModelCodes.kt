@@ -8,4 +8,5 @@ internal object ModelCodes {
     const val SUBSCRIPTION = 4 * MULTIPLIER
     const val CHAT = 5 * MULTIPLIER
     const val USER_CHAT = 6 * MULTIPLIER
+    const val MESSAGE = 7 * MULTIPLIER
 }

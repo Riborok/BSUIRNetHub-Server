@@ -7,6 +7,7 @@ internal object ErrorCategories {
     const val ALREADY_EXISTS = 3 * MULTIPLIER
     const val MULTIPLE_FOUND = 4 * MULTIPLIER
     const val DUPLICATES_IN_REQUEST = 5 * MULTIPLIER
-    const val INVALID_NEGATIVE_VALUE = 6 * MULTIPLIER
+    const val INVALID_NEGATIVE_VALUE_IN_REQUEST = 6 * MULTIPLIER
+    const val INVALID_PAGE_REQUEST = 7 * MULTIPLIER
     const val OTHER = 99 * MULTIPLIER
 }
