@@ -6,6 +6,7 @@ import com.bsuirnethub.exception.RestStatusException
 import com.bsuirnethub.service.ChatService
 import com.bsuirnethub.service.MessageService
 import com.bsuirnethub.service.UserChatService
+import com.bsuirnethub.service.UserService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -19,6 +20,7 @@ class MessageServiceTest(
     @Autowired val chatService: ChatService,
     @Autowired val messageService: MessageService,
     @Autowired val userChatService: UserChatService,
+    @Autowired val userService: UserService,
     @Autowired val userInitializer: UserInitializer,
     @Autowired private val databaseCleanup: DatabaseCleanup
 ) {
@@ -155,5 +157,16 @@ class MessageServiceTest(
         assertThrows<RestStatusException> {
             messageService.getMessages(userIds[2], chat.id!!)
         }
+    }
+
+    @Test
+    fun `test Messages After Deleting User`() {
+        val userIds = userInitializer.createAndSaveUsers(1).userIds
+        val userId = userIds[0]
+        val chat = chatService.createUniqueChat(listOf(userId))
+        val contents = (0 until 42).map { "$content$it" }
+        contents.forEach { messageService.saveMessage(userId, chat.id!!, it) }
+        userService.deleteUser(userId)
+        assertEquals(0, databaseCleanup.messageRepository.count())
     }
 }

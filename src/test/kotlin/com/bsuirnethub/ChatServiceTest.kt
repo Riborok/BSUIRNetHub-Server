@@ -123,12 +123,11 @@ class ChatServiceTest(
     }
 
     @Test
-    fun `test Chat After Deleting User`() {
+    fun `test Chats After Deleting User`() {
         val userIds = userInitializer.createAndSaveUsers(3).userIds
         val allCombinations = userIds.combinations().filter { it.isNotEmpty() }
         allCombinations.forEach { chatService.createUniqueChat(it) }
         userIds.forEach { userService.deleteUser(it) }
-        assertEquals(0, databaseCleanup.userChatRepository.count())
         assertEquals(0, databaseCleanup.chatRepository.count())
     }
 }

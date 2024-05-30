@@ -3,8 +3,10 @@ package com.bsuirnethub
 import com.bsuirnethub.component.DatabaseCleanup
 import com.bsuirnethub.component.UserInitializer
 import com.bsuirnethub.exception.RestStatusException
+import com.bsuirnethub.extension.combinations
 import com.bsuirnethub.service.ChatService
 import com.bsuirnethub.service.UserChatService
+import com.bsuirnethub.service.UserService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -17,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest
 class UserChatServiceTest (
     @Autowired val chatService: ChatService,
     @Autowired val userChatService: UserChatService,
+    @Autowired val userService: UserService,
     @Autowired val userInitializer: UserInitializer,
     @Autowired private val databaseCleanup: DatabaseCleanup
 ){
@@ -92,5 +95,14 @@ class UserChatServiceTest (
         assertThrows<RestStatusException> {
             userChatService.markMessagesAsRead(userIds[0], chat.id!!, 10)
         }
+    }
+
+    @Test
+    fun `test User Chats After Deleting User`() {
+        val userIds = userInitializer.createAndSaveUsers(3).userIds
+        val allCombinations = userIds.combinations().filter { it.isNotEmpty() }
+        allCombinations.forEach { chatService.createUniqueChat(it) }
+        userIds.forEach { userService.deleteUser(it) }
+        assertEquals(0, databaseCleanup.userChatRepository.count())
     }
 }

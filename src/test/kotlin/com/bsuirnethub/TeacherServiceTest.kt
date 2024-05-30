@@ -4,6 +4,7 @@ import com.bsuirnethub.component.DatabaseCleanup
 import com.bsuirnethub.component.UserInitializer
 import com.bsuirnethub.exception.RestStatusException
 import com.bsuirnethub.service.TeacherService
+import com.bsuirnethub.service.UserService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -15,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest
 @SpringBootTest
 class TeacherServiceTest(
     @Autowired private val teacherService: TeacherService,
+    @Autowired private val userService: UserService,
     @Autowired val userInitializer: UserInitializer,
     @Autowired private val databaseCleanup: DatabaseCleanup
 ) {
@@ -73,10 +75,20 @@ class TeacherServiceTest(
     fun `test getTeacherIds`() {
         val userIds = userInitializer.createAndSaveUsers(1).userIds
         val userId = userIds[0]
-        val teacherIdsToAdd = List(42) { "teacher$it" }
+        val teacherIdsToAdd = List(42) { "$teacherId$it" }
         teacherIdsToAdd.forEach { teacherService.addTeacher(userId, it) }
         val teacherIds = teacherService.getTeacherIds(userId)
         assertEquals(42, teacherIds.size)
         assertTrue(teacherIds.containsAll(teacherIdsToAdd))
+    }
+
+    @Test
+    fun `test Teacher After Deleting User`() {
+        val userIds = userInitializer.createAndSaveUsers(1).userIds
+        val userId = userIds[0]
+        val teacherIdsToAdd = List(42) { "$teacherId$it" }
+        teacherIdsToAdd.forEach { teacherService.addTeacher(userId, it) }
+        userService.deleteUser(userId)
+        assertEquals(0, databaseCleanup.teacherRepository.count())
     }
 }

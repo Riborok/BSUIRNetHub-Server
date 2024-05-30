@@ -4,6 +4,7 @@ import com.bsuirnethub.component.DatabaseCleanup
 import com.bsuirnethub.component.UserInitializer
 import com.bsuirnethub.exception.RestStatusException
 import com.bsuirnethub.service.GroupService
+import com.bsuirnethub.service.UserService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -15,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest
 @SpringBootTest
 class GroupServiceTest(
     @Autowired private val groupService: GroupService,
+    @Autowired val userService: UserService,
     @Autowired val userInitializer: UserInitializer,
     @Autowired private val databaseCleanup: DatabaseCleanup
 ) {
@@ -73,10 +75,20 @@ class GroupServiceTest(
     fun `test getGroupIds`() {
         val userIds = userInitializer.createAndSaveUsers(1).userIds
         val userId = userIds[0]
-        val groupIdsToAdd = List(42) { "group$it" }
+        val groupIdsToAdd = List(42) { "$groupId$it" }
         groupIdsToAdd.forEach { groupService.addGroup(userId, it) }
         val groupIds = groupService.getGroupIds(userId)
         assertEquals(42, groupIds.size)
         assertTrue(groupIds.containsAll(groupIdsToAdd))
+    }
+
+    @Test
+    fun `test Groups After Deleting User`() {
+        val userIds = userInitializer.createAndSaveUsers(1).userIds
+        val userId = userIds[0]
+        val groupIdsToAdd = List(42) { "$groupId$it" }
+        groupIdsToAdd.forEach { groupService.addGroup(userId, it) }
+        userService.deleteUser(userId)
+        assertEquals(0, databaseCleanup.groupRepository.count())
     }
 }
