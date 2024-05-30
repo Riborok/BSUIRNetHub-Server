@@ -1,10 +1,9 @@
 package com.bsuirnethub
 
+import com.bsuirnethub.component.DatabaseCleanup
+import com.bsuirnethub.component.UserInitializer
 import com.bsuirnethub.exception.RestStatusException
-import com.bsuirnethub.repository.GroupRepository
-import com.bsuirnethub.repository.UserRepository
 import com.bsuirnethub.service.GroupService
-import com.bsuirnethub.service.UserService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -15,28 +14,26 @@ import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
 class GroupServiceTest(
-    @Autowired val userRepository: UserRepository,
-    @Autowired private val groupRepository: GroupRepository,
-    @Autowired val userService: UserService,
-    @Autowired private val groupService: GroupService
+    @Autowired private val groupService: GroupService,
+    @Autowired val userInitializer: UserInitializer,
+    @Autowired private val databaseCleanup: DatabaseCleanup
 ) {
     @BeforeEach
     fun setUp() {
-        groupRepository.deleteAll()
-        userRepository.deleteAll()
+        databaseCleanup.clearDatabase()
     }
 
     @AfterEach
     fun tearDown() {
-        groupRepository.deleteAll()
-        userRepository.deleteAll()
+        databaseCleanup.clearDatabase()
     }
+
+    private val groupId = "group"
 
     @Test
     fun `test addGroup`() {
-        val userId = "user"
-        val groupId = "group"
-        userService.createUser(userId)
+        val userIds = userInitializer.createAndSaveUsers(1).userIds
+        val userId = userIds[0]
         groupService.addGroup(userId, groupId)
         val groupIds = groupService.getGroupIds(userId)
         assertEquals(1, groupIds.size)
@@ -45,9 +42,8 @@ class GroupServiceTest(
 
     @Test
     fun `test addGroup with existing group`() {
-        val userId = "user"
-        val groupId = "group"
-        userService.createUser(userId)
+        val userIds = userInitializer.createAndSaveUsers(1).userIds
+        val userId = userIds[0]
         groupService.addGroup(userId, groupId)
         assertThrows<RestStatusException> {
             groupService.addGroup(userId, groupId)
@@ -56,9 +52,8 @@ class GroupServiceTest(
 
     @Test
     fun `test deleteGroup`() {
-        val userId = "user"
-        val groupId = "group"
-        userService.createUser(userId)
+        val userIds = userInitializer.createAndSaveUsers(1).userIds
+        val userId = userIds[0]
         groupService.addGroup(userId, groupId)
         groupService.deleteGroup(userId, groupId)
         val groupIds = groupService.getGroupIds(userId)
@@ -67,9 +62,8 @@ class GroupServiceTest(
 
     @Test
     fun `test deleteGroup with non-existent group`() {
-        val userId = "user"
-        val groupId = "group"
-        userService.createUser(userId)
+        val userIds = userInitializer.createAndSaveUsers(1).userIds
+        val userId = userIds[0]
         assertThrows<RestStatusException> {
             groupService.deleteGroup(userId, groupId)
         }
@@ -77,8 +71,8 @@ class GroupServiceTest(
 
     @Test
     fun `test getGroupIds`() {
-        val userId = "user"
-        userService.createUser(userId)
+        val userIds = userInitializer.createAndSaveUsers(1).userIds
+        val userId = userIds[0]
         val groupIdsToAdd = List(42) { "group$it" }
         groupIdsToAdd.forEach { groupService.addGroup(userId, it) }
         val groupIds = groupService.getGroupIds(userId)

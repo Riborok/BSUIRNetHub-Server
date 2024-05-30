@@ -1,5 +1,6 @@
 package com.bsuirnethub
 
+import com.bsuirnethub.component.DatabaseCleanup
 import com.bsuirnethub.exception.RestStatusException
 import com.bsuirnethub.repository.UserRepository
 import com.bsuirnethub.service.UserService
@@ -14,67 +15,66 @@ import org.springframework.boot.test.context.SpringBootTest
 @SpringBootTest
 class UserServiceTest(
     @Autowired private val userRepository: UserRepository,
-    @Autowired private val userService: UserService
+    @Autowired private val userService: UserService,
+    @Autowired private val databaseCleanup: DatabaseCleanup
 ) {
     @BeforeEach
     fun setUp() {
-        userRepository.deleteAll()
+        databaseCleanup.clearDatabase()
     }
 
     @AfterEach
     fun tearDown() {
-        userRepository.deleteAll()
+        databaseCleanup.clearDatabase()
     }
+
+    private val userId1 = "user1"
+    private val userId2 = "user2"
 
     @Test
     fun `test createUser`() {
-        val userId = "user"
-        userService.createUser(userId)
-        val user = userRepository.findByUserId(userId)
+        userService.createUser(userId1)
+        val user = userRepository.findByUserId(userId1)
         assertNotNull(user)
     }
 
     @Test
     fun `test createUser With Duplicate UserId`() {
-        val userId = "user"
-        userService.createUser(userId)
+        userService.createUser(userId1)
         assertThrows<RestStatusException> {
-            userService.createUser(userId)
+            userService.createUser(userId1)
         }
     }
 
     @Test
     fun `test deleteUser`() {
-        val userId = "user"
-        userService.createUser(userId)
-        userService.deleteUser(userId)
-        val user = userRepository.findByUserId(userId)
+        userService.createUser(userId1)
+        userService.deleteUser(userId1)
+        val user = userRepository.findByUserId(userId1)
         assertNull(user)
     }
 
     @Test
     fun `test deleteUser with non-existent user`() {
-        val userId = "user"
         assertThrows<RestStatusException> {
-            userService.deleteUser(userId)
+            userService.deleteUser(userId1)
         }
     }
 
     @Test
     fun `test getUserInfo`() {
-        val userId = "user"
-        userService.createUser(userId)
-        val user = userService.getUserInfo(userId)
-        assertEquals(userId, user.userId)
+        userService.createUser(userId1)
+        val user = userService.getUserInfo(userId1)
+        assertEquals(userId1, user.userId)
     }
 
     @Test
     fun `test getUserIds`() {
-        userService.createUser("user1")
-        userService.createUser("user2")
+        userService.createUser(userId1)
+        userService.createUser(userId2)
         val userIds = userService.getUserIds()
         assertEquals(2, userIds.size)
-        assertTrue(userIds.any { it == "user1" })
-        assertTrue(userIds.any { it == "user2" })
+        assertTrue(userIds.any { it == userId1 })
+        assertTrue(userIds.any { it == userId2 })
     }
 }

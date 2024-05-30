@@ -1,10 +1,9 @@
 package com.bsuirnethub
 
+import com.bsuirnethub.component.DatabaseCleanup
+import com.bsuirnethub.component.UserInitializer
 import com.bsuirnethub.exception.RestStatusException
-import com.bsuirnethub.repository.TeacherRepository
-import com.bsuirnethub.repository.UserRepository
 import com.bsuirnethub.service.TeacherService
-import com.bsuirnethub.service.UserService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -15,28 +14,26 @@ import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
 class TeacherServiceTest(
-    @Autowired val userRepository: UserRepository,
-    @Autowired private val teacherRepository: TeacherRepository,
-    @Autowired val userService: UserService,
-    @Autowired private val teacherService: TeacherService
+    @Autowired private val teacherService: TeacherService,
+    @Autowired val userInitializer: UserInitializer,
+    @Autowired private val databaseCleanup: DatabaseCleanup
 ) {
     @BeforeEach
     fun setUp() {
-        teacherRepository.deleteAll()
-        userRepository.deleteAll()
+        databaseCleanup.clearDatabase()
     }
 
     @AfterEach
     fun tearDown() {
-        teacherRepository.deleteAll()
-        userRepository.deleteAll()
+        databaseCleanup.clearDatabase()
     }
+
+    private val teacherId = "teacher"
 
     @Test
     fun `test addTeacher`() {
-        val userId = "user"
-        val teacherId = "teacher"
-        userService.createUser(userId)
+        val userIds = userInitializer.createAndSaveUsers(1).userIds
+        val userId = userIds[0]
         teacherService.addTeacher(userId, teacherId)
         val teacherIds = teacherService.getTeacherIds(userId)
         assertEquals(1, teacherIds.size)
@@ -45,9 +42,8 @@ class TeacherServiceTest(
 
     @Test
     fun `test addTeacher with existing teacher`() {
-        val userId = "user"
-        val teacherId = "teacher"
-        userService.createUser(userId)
+        val userIds = userInitializer.createAndSaveUsers(1).userIds
+        val userId = userIds[0]
         teacherService.addTeacher(userId, teacherId)
         assertThrows<RestStatusException> {
             teacherService.addTeacher(userId, teacherId)
@@ -56,9 +52,8 @@ class TeacherServiceTest(
 
     @Test
     fun `test deleteTeacher`() {
-        val userId = "user"
-        val teacherId = "teacher"
-        userService.createUser(userId)
+        val userIds = userInitializer.createAndSaveUsers(1).userIds
+        val userId = userIds[0]
         teacherService.addTeacher(userId, teacherId)
         teacherService.deleteTeacher(userId, teacherId)
         val teacherIds = teacherService.getTeacherIds(userId)
@@ -67,9 +62,8 @@ class TeacherServiceTest(
 
     @Test
     fun `test deleteTeacher with non-existent teacher`() {
-        val userId = "user"
-        val teacherId = "teacher"
-        userService.createUser(userId)
+        val userIds = userInitializer.createAndSaveUsers(1).userIds
+        val userId = userIds[0]
         assertThrows<RestStatusException> {
             teacherService.deleteTeacher(userId, teacherId)
         }
@@ -77,8 +71,8 @@ class TeacherServiceTest(
 
     @Test
     fun `test getTeacherIds`() {
-        val userId = "user"
-        userService.createUser(userId)
+        val userIds = userInitializer.createAndSaveUsers(1).userIds
+        val userId = userIds[0]
         val teacherIdsToAdd = List(42) { "teacher$it" }
         teacherIdsToAdd.forEach { teacherService.addTeacher(userId, it) }
         val teacherIds = teacherService.getTeacherIds(userId)

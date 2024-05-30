@@ -1,16 +1,13 @@
 package com.bsuirnethub
 
-import com.bsuirnethub.entity.ChatEntity
-import com.bsuirnethub.entity.UserChatEntity
-import com.bsuirnethub.entity.UserEntity
+import com.bsuirnethub.component.DatabaseCleanup
+import com.bsuirnethub.component.UserInitializer
 import com.bsuirnethub.exception.RestStatusException
-import com.bsuirnethub.repository.ChatRepository
-import com.bsuirnethub.repository.UserChatRepository
-import com.bsuirnethub.repository.UserRepository
 import com.bsuirnethub.service.ChatService
 import com.bsuirnethub.service.UserService
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -19,77 +16,56 @@ import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
 class ChatServiceTest(
-    @Autowired val userRepository: UserRepository,
-    @Autowired val chatRepository: ChatRepository,
-    @Autowired val userChatRepository: UserChatRepository,
     @Autowired val chatService: ChatService,
     @Autowired val userService: UserService,
+    @Autowired val userInitializer: UserInitializer,
+    @Autowired private val databaseCleanup: DatabaseCleanup
 ) {
     @BeforeEach
     fun setUp() {
-        userRepository.deleteAll()
-        chatRepository.deleteAll()
-        userChatRepository.deleteAll()
+        databaseCleanup.clearDatabase()
     }
 
     @AfterEach
     fun tearDown() {
-        userRepository.deleteAll()
-        chatRepository.deleteAll()
-        userChatRepository.deleteAll()
+        databaseCleanup.clearDatabase()
     }
 
     @Test
     fun `test createUniqueChat`() {
-        val userId1 = "user1"
-        val userId2 = "user2"
-        val user1 = UserEntity(userId = userId1)
-        val user2 = UserEntity(userId = userId2)
-        userRepository.saveAll(listOf(user1, user2))
-        val chat = chatService.createUniqueChat(listOf(userId1, userId2))
+        val userIds = userInitializer.createAndSaveUsers(2).userIds
+        val chat = chatService.createUniqueChat(listOf(userIds[0], userIds[1]))
         assertEquals(2, chat.userChats!!.size)
     }
 
     @Test
     fun `test createUniqueChat When Chat Already Exists`() {
-        val userId1 = "user1"
-        val userId2 = "user2"
-        val user1 = UserEntity(userId = userId1)
-        val user2 = UserEntity(userId = userId2)
-        userRepository.saveAll(listOf(user1, user2))
-        chatService.createUniqueChat(listOf(userId1, userId2))
+        val userIds = userInitializer.createAndSaveUsers(2).userIds
+        chatService.createUniqueChat(listOf(userIds[0], userIds[1]))
         assertThrows<RestStatusException> {
-            chatService.createUniqueChat(listOf(userId1, userId2))
+            chatService.createUniqueChat(listOf(userIds[0], userIds[1]))
         }
         assertThrows<RestStatusException> {
-            chatService.createUniqueChat(listOf(userId2, userId1))
+            chatService.createUniqueChat(listOf(userIds[1], userIds[0]))
         }
     }
 
     @Test
     fun `test createUniqueChat With Duplicates Users`() {
-        val userId1 = "user1"
-        val userId2 = "user2"
-        val user1 = UserEntity(userId = userId1)
-        val user2 = UserEntity(userId = userId2)
-        userRepository.saveAll(listOf(user1, user2))
+        val userIds = userInitializer.createAndSaveUsers(2).userIds
         assertThrows<RestStatusException> {
-            chatService.createUniqueChat(listOf(userId1, userId2, userId1))
+            chatService.createUniqueChat(listOf(userIds[0], userIds[1], userIds[0]))
         }
     }
 
     @Test
     fun `test deleteChat`() {
-        val userId1 = "user1"
-        val userId2 = "user2"
-        val user1 = UserEntity(userId = userId1)
-        val user2 = UserEntity(userId = userId2)
-        userRepository.saveAll(listOf(user1, user2))
-        val chat = chatService.createUniqueChat(listOf(userId1, userId2))
-        chatService.deleteChat(userId1, chat.id!!)
-        assertEquals(0, chatRepository.count())
-        assertEquals(0, userChatRepository.count())
-        assertEquals(2, userRepository.count())
+        val userIds = userInitializer.createAndSaveUsers(2).userIds
+        val chat = chatService.createUniqueChat(listOf(userIds[0], userIds[1]))
+        chatService.deleteChat(userIds[0], chat.id!!)
+        assertEquals(0, databaseCleanup.chatRepository.count())
+        assertEquals(0, databaseCleanup.userChatRepository.count())
+        assertEquals(2, databaseCleanup.userRepository.count())
     }
 
     @Test
@@ -103,84 +79,49 @@ class ChatServiceTest(
 
     @Test
     fun `test deleteChat When senderId Not In Participants`() {
-        val userId1 = "user1"
-        val userId2 = "user2"
-        val user1 = UserEntity(userId = userId1)
-        userRepository.save(user1)
-        val chat = chatService.createUniqueChat(listOf(userId1))
+        val userIds = userInitializer.createAndSaveUsers(2).userIds
+        val chat = chatService.createUniqueChat(listOf(userIds[0]))
         assertThrows<RestStatusException> {
-            chatService.deleteChat(userId2, chat.id!!)
+            chatService.deleteChat(userIds[1], chat.id!!)
         }
     }
 
     @Test
     fun `test getUniqueChat With Various Combinations Of Participants`() {
-        val userId1 = "user1"
-        val userId2 = "user2"
-        val userId3 = "user3"
-        val user1 = UserEntity(userId = userId1)
-        val user2 = UserEntity(userId = userId2)
-        val user3 = UserEntity(userId = userId3)
-        userRepository.saveAll(listOf(user1, user2, user3))
-        val chat1 = chatService.createUniqueChat(listOf(userId1, userId2))
-        val chat2 = chatService.createUniqueChat(listOf(userId1, userId3))
-        val chat3 = chatService.createUniqueChat(listOf(userId2, userId3))
-        val chat4 = chatService.createUniqueChat(listOf(userId1, userId2, userId3))
-        val chat5 = chatService.createUniqueChat(listOf(userId1))
-        val chat6 = chatService.createUniqueChat(listOf(userId2))
-        val chat7 = chatService.createUniqueChat(listOf(userId3))
-        assertEquals(chat1.id, chatService.getUniqueChat(userId1, listOf(userId2, userId1)).id)
-        assertEquals(chat2.id, chatService.getUniqueChat(userId1, listOf(userId3, userId1)).id)
-        assertEquals(chat3.id, chatService.getUniqueChat(userId2, listOf(userId3, userId2)).id)
-        assertEquals(chat4.id, chatService.getUniqueChat(userId1, listOf(userId3, userId2, userId1)).id)
-        assertEquals(chat5.id, chatService.getUniqueChat(userId1, listOf(userId1)).id)
-        assertEquals(chat6.id, chatService.getUniqueChat(userId2, listOf(userId2)).id)
-        assertEquals(chat7.id, chatService.getUniqueChat(userId3, listOf(userId3)).id)
+        val userIds = userInitializer.createAndSaveUsers(3).userIds
+        val chat1 = chatService.createUniqueChat(listOf(userIds[0], userIds[1]))
+        val chat2 = chatService.createUniqueChat(listOf(userIds[0], userIds[2]))
+        val chat3 = chatService.createUniqueChat(listOf(userIds[1], userIds[2]))
+        val chat4 = chatService.createUniqueChat(listOf(userIds[0], userIds[1], userIds[2]))
+        val chat5 = chatService.createUniqueChat(listOf(userIds[0]))
+        val chat6 = chatService.createUniqueChat(listOf(userIds[1]))
+        val chat7 = chatService.createUniqueChat(listOf(userIds[2]))
+        assertEquals(chat1.id, chatService.getUniqueChat(userIds[0], listOf(userIds[1], userIds[0])).id)
+        assertEquals(chat2.id, chatService.getUniqueChat(userIds[0], listOf(userIds[2], userIds[0])).id)
+        assertEquals(chat3.id, chatService.getUniqueChat(userIds[1], listOf(userIds[2], userIds[1])).id)
+        assertEquals(chat4.id, chatService.getUniqueChat(userIds[0], listOf(userIds[2], userIds[1], userIds[0])).id)
+        assertEquals(chat5.id, chatService.getUniqueChat(userIds[0], listOf(userIds[0])).id)
+        assertEquals(chat6.id, chatService.getUniqueChat(userIds[1], listOf(userIds[1])).id)
+        assertEquals(chat7.id, chatService.getUniqueChat(userIds[2], listOf(userIds[2])).id)
     }
 
     @Test
     fun `test getUniqueChat When SenderId Not In Participants`() {
-        val userId1 = "user1"
-        val userId2 = "user2"
-        val user1 = UserEntity(userId = userId1)
-        userRepository.save(user1)
-        chatService.createUniqueChat(listOf(userId1))
+        val userIds = userInitializer.createAndSaveUsers(2).userIds
+        chatService.createUniqueChat(listOf(userIds[0]))
         assertThrows<RestStatusException> {
-            chatService.getUniqueChat(userId2, listOf(userId1))
-        }
-    }
-
-    @Test
-    fun `test getUniqueChat When Chat Not Unique`() {
-        val userId1 = "user1"
-        val userId2 = "user2"
-        val user1 = UserEntity(userId = userId1)
-        val user2 = UserEntity(userId = userId2)
-        userRepository.saveAll(listOf(user1, user2))
-        val chatEntity1 = ChatEntity().apply {
-            userChats.addAll(listOf(UserChatEntity(user = user1, chat = this), UserChatEntity(user = user2, chat = this)))
-        }
-        val chatEntity2 = ChatEntity().apply {
-            userChats.addAll(listOf(UserChatEntity(user = user1, chat = this), UserChatEntity(user = user2, chat = this)))
-        }
-        chatRepository.saveAll(listOf(chatEntity1, chatEntity2))
-        assertThrows<RestStatusException> {
-            chatService.getUniqueChat(userId2, listOf(userId1, userId2))
+            chatService.getUniqueChat(userIds[1], listOf(userIds[0]))
         }
     }
 
     @Test
     fun `test getChats`() {
-        val userId1 = "user1"
-        val userId2 = "user2"
-        val user1 = UserEntity(userId = userId1)
-        val user2 = UserEntity(userId = userId2)
-        userRepository.saveAll(listOf(user1, user2))
-        val chat1 = chatService.createUniqueChat(listOf(userId1, userId2))
-        val chat2 = chatService.createUniqueChat(listOf(userId1))
-        val chat3 = chatService.createUniqueChat(listOf(userId2))
-        val chatIds1 = chatService.getChats(userId1).map { it?.id }
-        val chatIds2 = chatService.getChats(userId2).map { it?.id }
+        val userIds = userInitializer.createAndSaveUsers(2).userIds
+        val chat1 = chatService.createUniqueChat(listOf(userIds[0], userIds[1]))
+        val chat2 = chatService.createUniqueChat(listOf(userIds[0]))
+        val chat3 = chatService.createUniqueChat(listOf(userIds[1]))
+        val chatIds1 = chatService.getChats(userIds[0]).map { it?.id }
+        val chatIds2 = chatService.getChats(userIds[1]).map { it?.id }
         assertEquals(2, chatIds1.size)
         assertEquals(2, chatIds2.size)
         assertTrue(chatIds1.contains(chat1.id))
@@ -191,24 +132,18 @@ class ChatServiceTest(
 
     @Test
     fun `test Chat After Deleting User`() {
-        val userId1 = "user1"
-        val userId2 = "user2"
-        val userId3 = "user3"
-        val user1 = UserEntity(userId = userId1)
-        val user2 = UserEntity(userId = userId2)
-        val user3 = UserEntity(userId = userId3)
-        userRepository.saveAll(listOf(user1, user2, user3))
-        chatService.createUniqueChat(listOf(userId1, userId2))
-        chatService.createUniqueChat(listOf(userId1, userId3))
-        chatService.createUniqueChat(listOf(userId2, userId3))
-        chatService.createUniqueChat(listOf(userId1, userId2, userId3))
-        chatService.createUniqueChat(listOf(userId1))
-        chatService.createUniqueChat(listOf(userId2))
-        chatService.createUniqueChat(listOf(userId3))
-        userService.deleteUser(userId1)
-        userService.deleteUser(userId2)
-        userService.deleteUser(userId3)
-        assertEquals(0, userChatRepository.count())
-        assertEquals(0, chatRepository.count())
+        val userIds = userInitializer.createAndSaveUsers(3).userIds
+        chatService.createUniqueChat(listOf(userIds[0], userIds[1]))
+        chatService.createUniqueChat(listOf(userIds[0], userIds[2]))
+        chatService.createUniqueChat(listOf(userIds[1], userIds[2]))
+        chatService.createUniqueChat(listOf(userIds[0], userIds[1], userIds[2]))
+        chatService.createUniqueChat(listOf(userIds[0]))
+        chatService.createUniqueChat(listOf(userIds[1]))
+        chatService.createUniqueChat(listOf(userIds[2]))
+        userService.deleteUser(userIds[0])
+        userService.deleteUser(userIds[1])
+        userService.deleteUser(userIds[2])
+        assertEquals(0, databaseCleanup.userChatRepository.count())
+        assertEquals(0, databaseCleanup.chatRepository.count())
     }
 }

@@ -1,8 +1,8 @@
 package com.bsuirnethub
 
+import com.bsuirnethub.component.DatabaseCleanup
+import com.bsuirnethub.component.UserInitializer
 import com.bsuirnethub.exception.RestStatusException
-import com.bsuirnethub.repository.SubscriptionRepository
-import com.bsuirnethub.repository.UserRepository
 import com.bsuirnethub.service.SubscriberService
 import com.bsuirnethub.service.SubscriptionService
 import com.bsuirnethub.service.UserService
@@ -16,99 +16,79 @@ import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
 class SubscriptionServiceTest (
-    @Autowired private val userRepository: UserRepository,
-    @Autowired private val subscriptionRepository: SubscriptionRepository,
-    @Autowired private val userService: UserService,
     @Autowired private val subscriptionService: SubscriptionService,
-    @Autowired private val subscriberService: SubscriberService
+    @Autowired private val subscriberService: SubscriberService,
+    @Autowired private val userService: UserService,
+    @Autowired val userInitializer: UserInitializer,
+    @Autowired private val databaseCleanup: DatabaseCleanup
 ) {
     @BeforeEach
     fun setUp() {
-        userRepository.deleteAll()
-        subscriptionRepository.deleteAll()
+        databaseCleanup.clearDatabase()
     }
 
     @AfterEach
     fun tearDown() {
-        userRepository.deleteAll()
-        subscriptionRepository.deleteAll()
+        databaseCleanup.clearDatabase()
     }
 
     @Test
     fun `test addSubscription`() {
-        val userId1 = "user1"
-        val userId2 = "user2"
-        userService.createUser(userId1)
-        userService.createUser(userId2)
-        subscriptionService.addSubscription(userId1, userId2)
-        val user1SubscriptionIds = subscriptionService.getSubscriptionIds(userId1)
-        val user2SubscriberIds = subscriberService.getSubscriberIds(userId2)
+        val userIds = userInitializer.createAndSaveUsers(2).userIds
+        subscriptionService.addSubscription(userIds[0], userIds[1])
+        val user1SubscriptionIds = subscriptionService.getSubscriptionIds(userIds[0])
+        val user2SubscriberIds = subscriberService.getSubscriberIds(userIds[1])
         assertEquals(1, user1SubscriptionIds.size)
         assertEquals(1, user2SubscriberIds.size)
     }
 
     @Test
     fun `test addSubscription multiple times to the same user`() {
-        val userId1 = "user1"
-        val userId2 = "user2"
-        userService.createUser(userId1)
-        userService.createUser(userId2)
-        subscriptionService.addSubscription(userId1, userId2)
+        val userIds = userInitializer.createAndSaveUsers(2).userIds
+        subscriptionService.addSubscription(userIds[0], userIds[1])
         assertThrows<RestStatusException> {
-            subscriptionService.addSubscription(userId1, userId2)
+            subscriptionService.addSubscription(userIds[0], userIds[1])
         }
     }
 
     @Test
     fun `test deleteSubscription`() {
-        val userId1 = "user1"
-        val userId2 = "user2"
-        userService.createUser(userId1)
-        userService.createUser(userId2)
-        subscriptionService.addSubscription(userId1, userId2)
-        subscriptionService.deleteSubscription(userId1, userId2)
-        val user1SubscriptionIds = subscriptionService.getSubscriptionIds(userId1)
-        val user2SubscriberIds = subscriberService.getSubscriberIds(userId2)
+        val userIds = userInitializer.createAndSaveUsers(2).userIds
+        subscriptionService.addSubscription(userIds[0], userIds[1])
+        subscriptionService.deleteSubscription(userIds[0], userIds[1])
+        val user1SubscriptionIds = subscriptionService.getSubscriptionIds(userIds[0])
+        val user2SubscriberIds = subscriberService.getSubscriberIds(userIds[1])
         assertEquals(0, user1SubscriptionIds.size)
         assertEquals(0, user2SubscriberIds.size)
     }
 
     @Test
     fun `test deleteSubscription with non-existent subscription`() {
-        val userId1 = "user1"
-        val userId2 = "user2"
-        userService.createUser(userId1)
-        userService.createUser(userId2)
+        val userIds = userInitializer.createAndSaveUsers(2).userIds
         assertThrows<RestStatusException> {
-            subscriptionService.deleteSubscription(userId1, userId2)
+            subscriptionService.deleteSubscription(userIds[0], userIds[1])
         }
     }
 
     @Test
     fun `test getSubscriptions`() {
-        val userId1 = "user1"
-        val userId2 = "user2"
-        userService.createUser(userId1)
-        userService.createUser(userId2)
-        subscriptionService.addSubscription(userId1, userId2)
-        val subscriptions = subscriptionService.getSubscriptionIds(userId1)
+        val userIds = userInitializer.createAndSaveUsers(2).userIds
+        subscriptionService.addSubscription(userIds[0], userIds[1])
+        val subscriptions = subscriptionService.getSubscriptionIds(userIds[0])
         assertEquals(1, subscriptions.size)
-        assertEquals(userId2, subscriptions[0])
+        assertEquals(userIds[1], subscriptions[0])
     }
 
     @Test
     fun `test Subscriptions And Subscribers After Deleting User`() {
-        val userId1 = "user1"
-        val userId2 = "user2"
-        userService.createUser(userId1)
-        userService.createUser(userId2)
-        subscriptionService.addSubscription(userId1, userId2)
-        subscriptionService.addSubscription(userId2, userId1)
-        userService.deleteUser(userId2)
-        val subscribers = subscriberService.getSubscriberIds(userId1)
-        val subscriptions = subscriptionService.getSubscriptionIds(userId1)
+        val userIds = userInitializer.createAndSaveUsers(2).userIds
+        subscriptionService.addSubscription(userIds[0], userIds[1])
+        subscriptionService.addSubscription(userIds[1], userIds[0])
+        userService.deleteUser(userIds[1])
+        val subscribers = subscriberService.getSubscriberIds(userIds[0])
+        val subscriptions = subscriptionService.getSubscriptionIds(userIds[0])
         assertEquals(0, subscribers.size)
         assertEquals(0, subscriptions.size)
-        assertEquals(0, subscriptionRepository.count())
+        assertEquals(0, databaseCleanup.subscriptionRepository.count())
     }
 }
