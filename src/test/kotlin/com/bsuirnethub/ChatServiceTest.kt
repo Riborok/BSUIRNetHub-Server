@@ -3,6 +3,7 @@ package com.bsuirnethub
 import com.bsuirnethub.component.DatabaseCleanup
 import com.bsuirnethub.component.UserInitializer
 import com.bsuirnethub.exception.RestStatusException
+import com.bsuirnethub.extension.combinations
 import com.bsuirnethub.service.ChatService
 import com.bsuirnethub.service.UserService
 import org.junit.jupiter.api.AfterEach
@@ -88,21 +89,12 @@ class ChatServiceTest(
 
     @Test
     fun `test getUniqueChat With Various Combinations Of Participants`() {
-        val userIds = userInitializer.createAndSaveUsers(3).userIds
-        val chat1 = chatService.createUniqueChat(listOf(userIds[0], userIds[1]))
-        val chat2 = chatService.createUniqueChat(listOf(userIds[0], userIds[2]))
-        val chat3 = chatService.createUniqueChat(listOf(userIds[1], userIds[2]))
-        val chat4 = chatService.createUniqueChat(listOf(userIds[0], userIds[1], userIds[2]))
-        val chat5 = chatService.createUniqueChat(listOf(userIds[0]))
-        val chat6 = chatService.createUniqueChat(listOf(userIds[1]))
-        val chat7 = chatService.createUniqueChat(listOf(userIds[2]))
-        assertEquals(chat1.id, chatService.getUniqueChat(userIds[0], listOf(userIds[1], userIds[0])).id)
-        assertEquals(chat2.id, chatService.getUniqueChat(userIds[0], listOf(userIds[2], userIds[0])).id)
-        assertEquals(chat3.id, chatService.getUniqueChat(userIds[1], listOf(userIds[2], userIds[1])).id)
-        assertEquals(chat4.id, chatService.getUniqueChat(userIds[0], listOf(userIds[2], userIds[1], userIds[0])).id)
-        assertEquals(chat5.id, chatService.getUniqueChat(userIds[0], listOf(userIds[0])).id)
-        assertEquals(chat6.id, chatService.getUniqueChat(userIds[1], listOf(userIds[1])).id)
-        assertEquals(chat7.id, chatService.getUniqueChat(userIds[2], listOf(userIds[2])).id)
+        val userIds = userInitializer.createAndSaveUsers(6).userIds
+        val allCombinations = userIds.combinations().filter { it.isNotEmpty() }
+        val chatMap = allCombinations.associateWith { chatService.createUniqueChat(it) }
+        chatMap.forEach { (participantIds, chat) ->
+            assertEquals(chat.id, chatService.getUniqueChat(participantIds[0], participantIds).id)
+        }
     }
 
     @Test
@@ -133,16 +125,9 @@ class ChatServiceTest(
     @Test
     fun `test Chat After Deleting User`() {
         val userIds = userInitializer.createAndSaveUsers(3).userIds
-        chatService.createUniqueChat(listOf(userIds[0], userIds[1]))
-        chatService.createUniqueChat(listOf(userIds[0], userIds[2]))
-        chatService.createUniqueChat(listOf(userIds[1], userIds[2]))
-        chatService.createUniqueChat(listOf(userIds[0], userIds[1], userIds[2]))
-        chatService.createUniqueChat(listOf(userIds[0]))
-        chatService.createUniqueChat(listOf(userIds[1]))
-        chatService.createUniqueChat(listOf(userIds[2]))
-        userService.deleteUser(userIds[0])
-        userService.deleteUser(userIds[1])
-        userService.deleteUser(userIds[2])
+        val allCombinations = userIds.combinations().filter { it.isNotEmpty() }
+        allCombinations.forEach { chatService.createUniqueChat(it) }
+        userIds.forEach { userService.deleteUser(it) }
         assertEquals(0, databaseCleanup.userChatRepository.count())
         assertEquals(0, databaseCleanup.chatRepository.count())
     }
