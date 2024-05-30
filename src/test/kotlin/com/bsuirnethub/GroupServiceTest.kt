@@ -41,7 +41,7 @@ class GroupServiceTest(
     }
 
     @Test
-    fun `test addGroup with existing group`() {
+    fun `test addGroup With Existing Group`() {
         val userIds = userInitializer.createAndSaveUsers(1).userIds
         val userId = userIds[0]
         groupService.addGroup(userId, groupId)
@@ -61,7 +61,7 @@ class GroupServiceTest(
     }
 
     @Test
-    fun `test deleteGroup with non-existent group`() {
+    fun `test deleteGroup With Non-Existent Group`() {
         val userIds = userInitializer.createAndSaveUsers(1).userIds
         val userId = userIds[0]
         assertThrows<RestStatusException> {

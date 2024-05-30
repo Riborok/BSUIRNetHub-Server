@@ -43,7 +43,7 @@ class SubscriptionServiceTest (
     }
 
     @Test
-    fun `test addSubscription multiple times to the same user`() {
+    fun `test addSubscription Multiple Times To The Same User`() {
         val userIds = userInitializer.createAndSaveUsers(2).userIds
         subscriptionService.addSubscription(userIds[0], userIds[1])
         assertThrows<RestStatusException> {
@@ -63,7 +63,7 @@ class SubscriptionServiceTest (
     }
 
     @Test
-    fun `test deleteSubscription with non-existent subscription`() {
+    fun `test deleteSubscription With Non-Existent Subscription`() {
         val userIds = userInitializer.createAndSaveUsers(2).userIds
         assertThrows<RestStatusException> {
             subscriptionService.deleteSubscription(userIds[0], userIds[1])

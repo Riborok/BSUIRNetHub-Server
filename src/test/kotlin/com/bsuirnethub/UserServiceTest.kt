@@ -55,7 +55,7 @@ class UserServiceTest(
     }
 
     @Test
-    fun `test deleteUser with non-existent user`() {
+    fun `test deleteUser With Non-Existent User`() {
         assertThrows<RestStatusException> {
             userService.deleteUser(userId1)
         }

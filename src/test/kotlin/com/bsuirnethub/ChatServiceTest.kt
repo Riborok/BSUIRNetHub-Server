@@ -70,7 +70,7 @@ class ChatServiceTest(
     }
 
     @Test
-    fun `test deleteChat with non-existent id`() {
+    fun `test deleteChat With Non-Existent Id`() {
         val userId = "user1"
         val chatId = 1L
         assertThrows<RestStatusException> {

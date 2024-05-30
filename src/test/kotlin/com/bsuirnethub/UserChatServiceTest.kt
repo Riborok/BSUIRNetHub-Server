@@ -68,7 +68,7 @@ class UserChatServiceTest (
     }
 
     @Test
-    fun `test markMessagesAsRead when readCount exceeds unreadCount`() {
+    fun `test markMessagesAsRead When readCount Exceeds unreadCount`() {
         val userIds = userInitializer.createAndSaveUsers(2).userIds
         val chat = chatService.createUniqueChat(listOf(userIds[0], userIds[1]))
         userChatService.incrementUnreadMessagesForRecipients(userIds[0], chat.id!!, 10)

@@ -41,7 +41,7 @@ class TeacherServiceTest(
     }
 
     @Test
-    fun `test addTeacher with existing teacher`() {
+    fun `test addTeacher With Existing Teacher`() {
         val userIds = userInitializer.createAndSaveUsers(1).userIds
         val userId = userIds[0]
         teacherService.addTeacher(userId, teacherId)
@@ -61,7 +61,7 @@ class TeacherServiceTest(
     }
 
     @Test
-    fun `test deleteTeacher with non-existent teacher`() {
+    fun `test deleteTeacher With Non-Existent Teacher`() {
         val userIds = userInitializer.createAndSaveUsers(1).userIds
         val userId = userIds[0]
         assertThrows<RestStatusException> {
