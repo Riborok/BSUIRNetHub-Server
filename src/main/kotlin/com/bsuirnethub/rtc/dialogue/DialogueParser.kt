@@ -7,11 +7,19 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 object DialogueParser {
     private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
 
-    fun parseRequest(payload: String): Request? {
+    fun parseRequest(payload: String): Request {
         return try {
             objectMapper.readValue(payload, Request::class.java)
         } catch (_: JsonProcessingException) {
-            null
+            throw Exception()
+        }
+    }
+
+    fun serialize(response: Any): String {
+        return try {
+            objectMapper.writeValueAsString(response)
+        } catch (_: JsonProcessingException) {
+            throw Exception()
         }
     }
 }
