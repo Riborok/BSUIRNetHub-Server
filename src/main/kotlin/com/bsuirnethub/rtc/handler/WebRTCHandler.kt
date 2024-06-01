@@ -12,29 +12,24 @@ import java.util.concurrent.ConcurrentHashMap
 class WebRTCHandler(
     private val clients: ConcurrentHashMap<UserId, WebSocketSession>
 ) {
-    fun handleRequest(session: WebSocketSession, webRTCRequest: WebRTCRequest) {
-        val userId = SessionExtractor.extractSubFromSession(session)
+    fun handleRequest(userId: UserId, webRTCRequest: WebRTCRequest) {
         when (webRTCRequest) {
-            is WebRTCRequest.STATE -> handleStateRequest(session, webRTCRequest)
-            is WebRTCRequest.OFFER -> handleOfferRequest(session, webRTCRequest)
-            is WebRTCRequest.ANSWER -> handleAnswerRequest(session, webRTCRequest)
-            is WebRTCRequest.ICE -> handleIceRequest(session, webRTCRequest)
+            is WebRTCRequest.STATE -> handleStateRequest(userId, webRTCRequest)
+            is WebRTCRequest.OFFER -> handleOfferRequest(userId, webRTCRequest)
+            is WebRTCRequest.ANSWER -> handleAnswerRequest(userId, webRTCRequest)
+            is WebRTCRequest.ICE -> handleIceRequest(userId, webRTCRequest)
         }
     }
 
-    fun handleStateRequest(session: WebSocketSession, webRTCRequest: WebRTCRequest.STATE) {
-        session.sendMessage(TextMessage("STATE"))
+    private fun handleStateRequest(userId: UserId, webRTCRequest: WebRTCRequest.STATE) {
     }
 
-    fun handleOfferRequest(session: WebSocketSession, webRTCRequest: WebRTCRequest.OFFER) {
-        session.sendMessage(TextMessage("OFFER"))
+    private fun handleOfferRequest(userId: UserId, webRTCRequest: WebRTCRequest.OFFER) {
     }
 
-    fun handleAnswerRequest(session: WebSocketSession, webRTCRequest: WebRTCRequest.ANSWER) {
-        session.sendMessage(TextMessage("ANSWER"))
+    private fun handleAnswerRequest(userId: UserId, webRTCRequest: WebRTCRequest.ANSWER) {
     }
 
-    fun handleIceRequest(session: WebSocketSession, webRTCRequest: WebRTCRequest.ICE) {
-        session.sendMessage(TextMessage("ICE"))
+    private fun handleIceRequest(userId: UserId, webRTCRequest: WebRTCRequest.ICE) {
     }
 }

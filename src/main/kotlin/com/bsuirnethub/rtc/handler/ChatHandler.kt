@@ -1,8 +1,10 @@
 package com.bsuirnethub.rtc.handler
 
 import com.bsuirnethub.alias.UserId
-import com.bsuirnethub.rtc.SessionExtractor
+import com.bsuirnethub.model.Chat
+import com.bsuirnethub.rtc.dialogue.DialogueParser
 import com.bsuirnethub.rtc.dialogue.chat.ChatRequest
+import com.bsuirnethub.rtc.dialogue.chat.ChatResponse
 import com.bsuirnethub.service.MessageService
 import com.bsuirnethub.service.UserChatService
 import org.springframework.stereotype.Component
@@ -16,25 +18,31 @@ class ChatHandler(
     private val messageService: MessageService,
     private val clients: ConcurrentHashMap<UserId, WebSocketSession>,
 ) {
-    fun handleRequest(session: WebSocketSession, chatRequest: ChatRequest) {
+    fun handleRequest(userId: UserId, chatRequest: ChatRequest) {
         when (chatRequest) {
-            is ChatRequest.SendChatRequest -> handleSendRequest(session, chatRequest)
-            is ChatRequest.MarkChatRequest -> handleMarkRequest(session, chatRequest)
+            is ChatRequest.Send -> handleSendRequest(userId, chatRequest)
+            is ChatRequest.Mark -> handleMarkRequest(userId, chatRequest)
         }
     }
 
-    fun handleSendRequest(session: WebSocketSession, chatRequest: ChatRequest.SendChatRequest) {
-        val userId = SessionExtractor.extractSubFromSession(session)
+    private fun handleSendRequest(userId: UserId, chatRequest: ChatRequest.Send) {
         val message = messageService.saveMessage(userId, chatRequest.chatId, chatRequest.content)
         val chat = userChatService.incrementUnreadMessagesForRecipients(userId, chatRequest.chatId)
-        val participant = chat.userChats?.map { it.userId }
-        participant?.forEach {
-
-        }
-        session.sendMessage(TextMessage("SendChatRequest"))
+        val response = ChatResponse.Send(chat, message)
+        sendMessagesToParticipants(chat, response)
     }
 
-    fun handleMarkRequest(session: WebSocketSession, chatRequest: ChatRequest.MarkChatRequest) {
-        session.sendMessage(TextMessage("MarkChatRequest"))
+    private fun handleMarkRequest(userId: UserId, chatRequest: ChatRequest.Mark) {
+        val chat = userChatService.markMessagesAsRead(userId, chatRequest.chatId, chatRequest.readMessage)
+        val response = ChatResponse.Mark(chat)
+        sendMessagesToParticipants(chat, response)
+    }
+
+    private fun sendMessagesToParticipants(chat: Chat, response: ChatResponse) {
+        val message = TextMessage(DialogueParser.serialize(response))
+        val participants = chat.userChats?.map { it.userId }
+        participants?.forEach {
+            clients[it]?.sendMessage(message)
+        }
     }
 }

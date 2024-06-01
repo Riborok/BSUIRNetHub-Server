@@ -3,10 +3,10 @@ package com.bsuirnethub.rtc
 import com.bsuirnethub.alias.UserId
 import com.bsuirnethub.exception.error_code.OtherErrorCode
 import com.bsuirnethub.exception.error_code_exception.ErrorCodeException
-import com.bsuirnethub.exception.error_code_exception.RestStatusException
 import com.bsuirnethub.exception.handler.WebSocketExceptionHandler
 import com.bsuirnethub.rtc.handler.ChatHandler
 import com.bsuirnethub.rtc.dialogue.DialogueParser
+import com.bsuirnethub.rtc.dialogue.Request
 import com.bsuirnethub.rtc.dialogue.chat.ChatRequest
 import com.bsuirnethub.rtc.dialogue.webrtc.WebRTCRequest
 import com.bsuirnethub.rtc.handler.WebRTCHandler
@@ -37,16 +37,22 @@ class SocketHandler(
         clients.remove(userId)
     }
 
-    override fun handleTextMessage(session: WebSocketSession, request: TextMessage) {
+    override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
+        val userId = SessionExtractor.extractSubFromSession(session)
         try {
-            when (val parsedRequest = DialogueParser.parseRequest(request.payload)) {
-                is ChatRequest -> chatHandler.handleRequest(session, parsedRequest)
-                is WebRTCRequest -> webRTCHandler.handleRequest(session, parsedRequest)
-                else -> throw ErrorCodeException(OtherErrorCode.UNKNOWN_REQUEST, parsedRequest)
-            }
+            val request = DialogueParser.parseRequest(message.payload)
+            handleRequest(userId, request)
         } catch (e: ErrorCodeException) {
             val errorResponse = webSocketExceptionHandler.handleErrorCodeException(e)
             session.sendMessage(TextMessage(DialogueParser.serialize(errorResponse)))
+        }
+    }
+
+    private fun handleRequest(userId: UserId, request: Request) {
+        when (request) {
+            is ChatRequest -> chatHandler.handleRequest(userId, request)
+            is WebRTCRequest -> webRTCHandler.handleRequest(userId, request)
+            else -> throw ErrorCodeException(OtherErrorCode.UNKNOWN_REQUEST, request)
         }
     }
 }
