@@ -9,7 +9,6 @@ import com.bsuirnethub.validator.UserChatValidator
 import com.bsuirnethub.entity.ChatEntity
 import com.bsuirnethub.entity.UserChatEntity
 import com.bsuirnethub.model.Chat
-import com.bsuirnethub.model.UserChat
 import com.bsuirnethub.model.toModel
 import com.bsuirnethub.repository.ChatRepository
 import com.bsuirnethub.repository.UserChatRepository
@@ -42,18 +41,17 @@ class UserChatService(
             .forEach { it.unreadMessages += messageCount }
     }
 
-    fun markMessagesAsRead(senderId: UserId, chatId: Long, messageCount: Int): UserChat {
+    fun markMessagesAsRead(senderId: UserId, chatId: Long, messageCount: Int): Chat {
         userChatValidator.validateMessageCountNonNegative(messageCount)
-        val userChatEntity = findUserChatEntity(senderId, chatId)
-        userChatEntity.unreadMessages -= messageCount.coerceAtMost(userChatEntity.unreadMessages)
-        val savedUserChatEntity = userChatRepository.save(userChatEntity)
-        return savedUserChatEntity.toModel()
-    }
-
-    private fun findUserChatEntity(senderId: UserId, chatId: Long): UserChatEntity {
         val senderEntity = userFinder.findUserEntityByIdOrThrow(senderId)
         val chatEntity = chatFinder.findChatEntityByIdOrThrow(chatId)
         val userChatEntity = userChatFinder.findUserChatEntityByUserEntityAndChatEntityOrThrow(senderEntity, chatEntity)
-        return userChatEntity
+        decreaseUnreadMessageCount(userChatEntity, messageCount)
+        userChatRepository.save(userChatEntity)
+        return chatEntity.toModel()
+    }
+
+    private fun decreaseUnreadMessageCount(userChatEntity: UserChatEntity, messageCount: Int) {
+        userChatEntity.unreadMessages -= messageCount.coerceAtMost(userChatEntity.unreadMessages)
     }
 }

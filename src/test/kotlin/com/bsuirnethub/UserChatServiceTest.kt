@@ -64,19 +64,21 @@ class UserChatServiceTest (
     @Test
     fun `test markMessagesAsRead`() {
         val userIds = userInitializer.createAndSaveUsers(2).userIds
-        val chat = chatService.createUniqueChat(listOf(userIds[0], userIds[1]))
+        var chat = chatService.createUniqueChat(listOf(userIds[0], userIds[1]))
         userChatService.incrementUnreadMessagesForRecipients(userIds[0], chat.id!!, 10)
-        val userChat = userChatService.markMessagesAsRead(userIds[1], chat.id!!, 5)
-        assertEquals(5, userChat.unreadMessages)
+        chat = userChatService.markMessagesAsRead(userIds[1], chat.id!!, 5)
+        val userChat = chat.userChats?.find { it.userId == userIds[1] }
+        assertEquals(5, userChat?.unreadMessages)
     }
 
     @Test
     fun `test markMessagesAsRead When readCount Exceeds unreadCount`() {
         val userIds = userInitializer.createAndSaveUsers(2).userIds
-        val chat = chatService.createUniqueChat(listOf(userIds[0], userIds[1]))
+        var chat = chatService.createUniqueChat(listOf(userIds[0], userIds[1]))
         userChatService.incrementUnreadMessagesForRecipients(userIds[0], chat.id!!, 10)
-        val userChat = userChatService.markMessagesAsRead(userIds[1], chat.id!!, 55)
-        assertEquals(0, userChat.unreadMessages)
+        chat = userChatService.markMessagesAsRead(userIds[1], chat.id!!, 55)
+        val userChat = chat.userChats?.find { it.userId == userIds[1] }
+        assertEquals(0, userChat?.unreadMessages)
     }
 
     @Test
