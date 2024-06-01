@@ -1,4 +1,4 @@
-package com.bsuirnethub.controller.private_api.me.chats
+package com.bsuirnethub.controller.private_api.me
 
 import com.bsuirnethub.ApiPaths
 import com.bsuirnethub.alias.UserId
