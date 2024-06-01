@@ -56,6 +56,12 @@ class ChatService(
         return chatEntity.toModel()
     }
 
+    fun getChat(senderId: UserId, chatId: Long): Chat {
+        val chatEntity = chatFinder.findChatEntityByIdOrThrow(chatId)
+        chatValidator.validateSenderIdInParticipants(senderId, chatEntity)
+        return chatEntity.toModel()
+    }
+
     fun getChats(userId: UserId): List<Chat?> {
         val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
         val userChatEntities = userEntity.userChats

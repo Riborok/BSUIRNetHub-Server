@@ -107,6 +107,26 @@ class ChatServiceTest(
     }
 
     @Test
+    fun `test getChat With Various Combinations Of Participants`() {
+        val userIds = userInitializer.createAndSaveUsers(6).userIds
+        val allCombinations = userIds.combinations().filter { it.isNotEmpty() }
+        val chatMap = allCombinations.associateWith { chatService.createUniqueChat(it) }
+        chatMap.forEach { (participantIds, chat) ->
+            val foundParticipants = chatService.getChat(participantIds[0], chat.id!!).userChats?.map { it.userId!! }!!
+            assertEquals(participantIds.sorted(), foundParticipants.sorted())
+        }
+    }
+
+    @Test
+    fun `test getChat When SenderId Not In Participants`() {
+        val userIds = userInitializer.createAndSaveUsers(2).userIds
+        val chat = chatService.createUniqueChat(listOf(userIds[0]))
+        assertThrows<RestStatusException> {
+            chatService.getChat(userIds[1], chat.id!!)
+        }
+    }
+
+    @Test
     fun `test getChats`() {
         val userIds = userInitializer.createAndSaveUsers(2).userIds
         val chat1 = chatService.createUniqueChat(listOf(userIds[0], userIds[1]))
