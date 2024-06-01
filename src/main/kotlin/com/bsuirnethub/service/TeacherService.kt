@@ -2,8 +2,8 @@ package com.bsuirnethub.service
 
 import com.bsuirnethub.alias.TeacherId
 import com.bsuirnethub.alias.UserId
-import com.bsuirnethub.component.finder.UserFinder
-import com.bsuirnethub.component.validator.TeacherValidator
+import com.bsuirnethub.finder.UserFinder
+import com.bsuirnethub.validator.TeacherValidator
 import com.bsuirnethub.entity.TeacherEntity
 import com.bsuirnethub.repository.TeacherRepository
 import org.springframework.stereotype.Service

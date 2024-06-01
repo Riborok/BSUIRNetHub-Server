@@ -1,8 +1,8 @@
 package com.bsuirnethub.service
 
 import com.bsuirnethub.alias.UserId
-import com.bsuirnethub.component.finder.UserFinder
-import com.bsuirnethub.component.validator.UserValidator
+import com.bsuirnethub.finder.UserFinder
+import com.bsuirnethub.validator.UserValidator
 import com.bsuirnethub.entity.UserEntity
 import com.bsuirnethub.model.User
 import com.bsuirnethub.model.toModel

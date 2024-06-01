@@ -1,8 +1,8 @@
 package com.bsuirnethub.service
 
 import com.bsuirnethub.alias.UserId
-import com.bsuirnethub.component.finder.UserFinder
-import com.bsuirnethub.component.validator.SubscriptionValidator
+import com.bsuirnethub.finder.UserFinder
+import com.bsuirnethub.validator.SubscriptionValidator
 import com.bsuirnethub.entity.SubscriptionEntity
 import com.bsuirnethub.repository.SubscriptionRepository
 import org.springframework.stereotype.Service

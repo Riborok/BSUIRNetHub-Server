@@ -1,7 +1,7 @@
-package com.bsuirnethub.component.finder
+package com.bsuirnethub.finder
 
 import com.bsuirnethub.alias.UserId
-import com.bsuirnethub.component.validator.UserValidator
+import com.bsuirnethub.validator.UserValidator
 import com.bsuirnethub.entity.UserEntity
 import com.bsuirnethub.repository.UserRepository
 import org.springframework.stereotype.Component

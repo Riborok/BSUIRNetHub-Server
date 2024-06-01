@@ -1,9 +1,11 @@
-package com.bsuirnethub.exception.error_code
+package com.bsuirnethub.exception.error_code.rest
 
+import com.bsuirnethub.exception.error_code.ErrorCategories
+import com.bsuirnethub.exception.error_code.ModelCodes
 import org.springframework.http.HttpStatus
 
-enum class ChatErrorCode(errorCategory: Int, override val message: String, override val status: HttpStatus) :
-    ErrorCode {
+enum class ChatRestErrorCode(errorCategory: Int, override val message: String, override val status: HttpStatus) :
+    RestErrorCode {
     CHAT_NOT_FOUND(ErrorCategories.NOT_FOUND, "Chat not found", HttpStatus.NOT_FOUND),
     CHAT_ALREADY_EXISTS(ErrorCategories.ALREADY_EXISTS, "Chat already exists", HttpStatus.CONFLICT),
     MULTIPLE_CHATS_FOUND(ErrorCategories.MULTIPLE_FOUND, "Multiple chats found", HttpStatus.CONFLICT),

@@ -2,8 +2,8 @@ package com.bsuirnethub.service
 
 import com.bsuirnethub.alias.GroupId
 import com.bsuirnethub.alias.UserId
-import com.bsuirnethub.component.finder.UserFinder
-import com.bsuirnethub.component.validator.GroupValidator
+import com.bsuirnethub.finder.UserFinder
+import com.bsuirnethub.validator.GroupValidator
 import com.bsuirnethub.entity.GroupEntity
 import com.bsuirnethub.repository.GroupRepository
 import org.springframework.stereotype.Service

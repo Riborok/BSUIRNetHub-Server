@@ -1,11 +1,11 @@
 package com.bsuirnethub.service
 
 import com.bsuirnethub.alias.UserId
-import com.bsuirnethub.component.finder.ChatFinder
-import com.bsuirnethub.component.finder.UserChatFinder
-import com.bsuirnethub.component.finder.UserFinder
-import com.bsuirnethub.component.validator.ChatValidator
-import com.bsuirnethub.component.validator.UserChatValidator
+import com.bsuirnethub.finder.ChatFinder
+import com.bsuirnethub.finder.UserChatFinder
+import com.bsuirnethub.finder.UserFinder
+import com.bsuirnethub.validator.ChatValidator
+import com.bsuirnethub.validator.UserChatValidator
 import com.bsuirnethub.entity.ChatEntity
 import com.bsuirnethub.entity.UserChatEntity
 import com.bsuirnethub.model.Chat

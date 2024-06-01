@@ -1,24 +1,24 @@
-package com.bsuirnethub.component.validator
+package com.bsuirnethub.validator
 
 import com.bsuirnethub.alias.UserId
-import com.bsuirnethub.exception.RestStatusException
-import com.bsuirnethub.exception.error_code.SubscriptionErrorCode
+import com.bsuirnethub.exception.rest_status_exception.RestStatusException
+import com.bsuirnethub.exception.error_code.rest.SubscriptionRestErrorCode
 import org.springframework.stereotype.Component
 
 @Component
 class SubscriptionValidator {
     fun validateUserIsNotSubscription(userId: UserId, subscriptionId: UserId) {
         if (userId == subscriptionId) {
-            throw RestStatusException(SubscriptionErrorCode.SELF_SUBSCRIPTION, subscriptionId)
+            throw RestStatusException(SubscriptionRestErrorCode.SELF_SUBSCRIPTION, subscriptionId)
         }
     }
 
     fun validateSubscriptionDeletion(deletedCount: Int, userId: UserId, subscriptionId: UserId) {
         if (deletedCount == 0)
-            throw RestStatusException(SubscriptionErrorCode.SUBSCRIPTION_NOT_FOUND, subscriptionId)
+            throw RestStatusException(SubscriptionRestErrorCode.SUBSCRIPTION_NOT_FOUND, subscriptionId)
     }
 
     fun validateSubscriptionDoesNotExists(userId: UserId, subscriptionId: UserId, operation: () -> UserId?): UserId? {
-        return validateEntityDoesNotExists(operation, SubscriptionErrorCode.SUBSCRIPTION_ALREADY_EXISTS, subscriptionId)
+        return validateEntityDoesNotExists(operation, SubscriptionRestErrorCode.SUBSCRIPTION_ALREADY_EXISTS, subscriptionId)
     }
 }

@@ -1,10 +1,10 @@
-package com.bsuirnethub.component.validator
+package com.bsuirnethub.validator
 
 import com.bsuirnethub.alias.UserId
 import com.bsuirnethub.entity.ChatEntity
 import com.bsuirnethub.entity.UserEntity
-import com.bsuirnethub.exception.RestStatusException
-import com.bsuirnethub.exception.error_code.ChatErrorCode
+import com.bsuirnethub.exception.rest_status_exception.RestStatusException
+import com.bsuirnethub.exception.error_code.rest.ChatRestErrorCode
 import com.bsuirnethub.model.Chat
 import org.springframework.stereotype.Component
 
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 class ChatValidator {
     fun validateChatDoesNotExist(chatCount: Int, userIds: List<UserId>) {
         if (chatCount > 0)
-            throw RestStatusException(ChatErrorCode.CHAT_ALREADY_EXISTS, userIds)
+            throw RestStatusException(ChatRestErrorCode.CHAT_ALREADY_EXISTS, userIds)
     }
 
     fun validateSenderIdInParticipants(senderId: UserId, chatEntity: ChatEntity) {
@@ -21,21 +21,21 @@ class ChatValidator {
 
     fun validateSenderIdInParticipants(senderId: UserId, participantIds: List<UserId>) {
         if (senderId !in participantIds)
-            throw RestStatusException(ChatErrorCode.SENDER_NOT_FOUND_IN_PARTICIPANTS, senderId)
+            throw RestStatusException(ChatRestErrorCode.SENDER_NOT_FOUND_IN_PARTICIPANTS, senderId)
     }
 
     fun validateChatExist(chatEntity: ChatEntity?, chatId: Long): ChatEntity {
-        return chatEntity ?: throw RestStatusException(ChatErrorCode.CHAT_NOT_FOUND, chatId)
+        return chatEntity ?: throw RestStatusException(ChatRestErrorCode.CHAT_NOT_FOUND, chatId)
     }
 
     fun validateSingleChatEntity(chatEntities: List<ChatEntity>, participantEntities: List<UserEntity>) {
         if (chatEntities.isEmpty())
-            throw RestStatusException(ChatErrorCode.CHAT_NOT_FOUND, participantEntities.map { it.userId })
+            throw RestStatusException(ChatRestErrorCode.CHAT_NOT_FOUND, participantEntities.map { it.userId })
         if (chatEntities.size > 1)
-            throw RestStatusException(ChatErrorCode.MULTIPLE_CHATS_FOUND, participantEntities.map { it.userId })
+            throw RestStatusException(ChatRestErrorCode.MULTIPLE_CHATS_FOUND, participantEntities.map { it.userId })
     }
 
     fun validateParticipantsUniqueness(participantIds: List<UserId>, operation: () -> Chat): Chat {
-        return validateEntityDoesNotExists(operation, ChatErrorCode.DUPLICATE_PARTICIPANTS, participantIds)
+        return validateEntityDoesNotExists(operation, ChatRestErrorCode.DUPLICATE_PARTICIPANTS, participantIds)
     }
 }

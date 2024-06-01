@@ -1,6 +1,6 @@
-package com.bsuirnethub.component.finder
+package com.bsuirnethub.finder
 
-import com.bsuirnethub.component.validator.UserChatValidator
+import com.bsuirnethub.validator.UserChatValidator
 import com.bsuirnethub.entity.ChatEntity
 import com.bsuirnethub.entity.UserChatEntity
 import com.bsuirnethub.entity.UserEntity

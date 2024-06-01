@@ -1,7 +1,7 @@
 package com.bsuirnethub
 
 import com.bsuirnethub.component.DatabaseCleanup
-import com.bsuirnethub.exception.RestStatusException
+import com.bsuirnethub.exception.rest_status_exception.RestStatusException
 import com.bsuirnethub.repository.UserRepository
 import com.bsuirnethub.service.UserService
 import org.junit.jupiter.api.AfterEach

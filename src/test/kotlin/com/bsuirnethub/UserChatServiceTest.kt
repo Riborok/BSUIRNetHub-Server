@@ -2,7 +2,7 @@ package com.bsuirnethub
 
 import com.bsuirnethub.component.DatabaseCleanup
 import com.bsuirnethub.component.UserInitializer
-import com.bsuirnethub.exception.RestStatusException
+import com.bsuirnethub.exception.rest_status_exception.RestStatusException
 import com.bsuirnethub.extension.combinations
 import com.bsuirnethub.service.ChatService
 import com.bsuirnethub.service.UserChatService

@@ -1,7 +1,7 @@
 package com.bsuirnethub.service
 
 import com.bsuirnethub.alias.UserId
-import com.bsuirnethub.component.finder.UserFinder
+import com.bsuirnethub.finder.UserFinder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
