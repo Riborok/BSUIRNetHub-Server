@@ -1,4 +1,4 @@
-package com.bsuirnethub.exception.error_code
+package com.bsuirnethub.exception.error_code.constant
 
 internal object ErrorCategories {
     private const val MULTIPLIER = 1_00
@@ -9,5 +9,8 @@ internal object ErrorCategories {
     const val DUPLICATES_IN_REQUEST = 5 * MULTIPLIER
     const val INVALID_NEGATIVE_VALUE_IN_REQUEST = 6 * MULTIPLIER
     const val INVALID_PAGE_REQUEST = 7 * MULTIPLIER
+    const val PARSING_ERROR = 8 * MULTIPLIER
+    const val SERIALIZATION_ERROR = 9 * MULTIPLIER
+    const val UNKNOWN_REQUEST = 10 * MULTIPLIER
     const val OTHER = 99 * MULTIPLIER
 }

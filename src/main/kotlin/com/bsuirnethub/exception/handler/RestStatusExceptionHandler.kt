@@ -1,6 +1,7 @@
-package com.bsuirnethub.exception.rest_status_exception
+package com.bsuirnethub.exception.handler
 
-import com.bsuirnethub.exception.ErrorResponse
+import com.bsuirnethub.exception.response.ErrorResponse
+import com.bsuirnethub.exception.error_code_exception.RestStatusException
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 class RestStatusExceptionHandler {
     @ExceptionHandler(RestStatusException::class)
     fun handleRestStatusException(ex: RestStatusException): ResponseEntity<ErrorResponse> {
-        val response = ErrorResponse(code = ex.restErrorCode.code, message = ex.restErrorCode.message, source = ex.source)
-        return ResponseEntity.status(ex.restErrorCode.status).body(response)
+        val response = ErrorResponse(code = ex.errorCode.code, message = ex.errorCode.message, source = ex.source)
+        return ResponseEntity.status(ex.errorCode.status).body(response)
     }
 }

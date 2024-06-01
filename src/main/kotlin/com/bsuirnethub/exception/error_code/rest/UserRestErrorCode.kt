@@ -1,7 +1,7 @@
 package com.bsuirnethub.exception.error_code.rest
 
-import com.bsuirnethub.exception.error_code.ErrorCategories
-import com.bsuirnethub.exception.error_code.ModelCodes
+import com.bsuirnethub.exception.error_code.constant.ErrorCategories
+import com.bsuirnethub.exception.error_code.constant.ModelCodes
 import org.springframework.http.HttpStatus
 
 enum class UserRestErrorCode(errorCategory: Int, override val message: String, override val status: HttpStatus) :

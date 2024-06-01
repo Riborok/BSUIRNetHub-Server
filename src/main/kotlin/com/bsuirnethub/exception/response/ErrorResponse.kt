@@ -1,4 +1,4 @@
-package com.bsuirnethub.exception
+package com.bsuirnethub.exception.response
 
 class ErrorResponse (
     val code: Int,

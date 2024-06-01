@@ -1,6 +1,10 @@
 package com.bsuirnethub.rtc
 
 import com.bsuirnethub.alias.UserId
+import com.bsuirnethub.exception.error_code.OtherErrorCode
+import com.bsuirnethub.exception.error_code_exception.ErrorCodeException
+import com.bsuirnethub.exception.error_code_exception.RestStatusException
+import com.bsuirnethub.exception.handler.WebSocketExceptionHandler
 import com.bsuirnethub.rtc.handler.ChatHandler
 import com.bsuirnethub.rtc.dialogue.DialogueParser
 import com.bsuirnethub.rtc.dialogue.chat.ChatRequest
@@ -19,7 +23,8 @@ class SocketHandler(
     private val chatHandler: ChatHandler,
     private val webRTCHandler: WebRTCHandler,
     private val clients: ConcurrentHashMap<UserId, WebSocketSession>,
-    private val sessionStates: ConcurrentHashMap<UserId, UserSession>
+    private val sessionStates: ConcurrentHashMap<UserId, UserSession>,
+    private val webSocketExceptionHandler: WebSocketExceptionHandler
 ) : TextWebSocketHandler() {
 
     override fun afterConnectionEstablished(session: WebSocketSession) {
@@ -33,10 +38,15 @@ class SocketHandler(
     }
 
     override fun handleTextMessage(session: WebSocketSession, request: TextMessage) {
-        when (val parsedRequest = DialogueParser.parseRequest(request.payload)) {
-            is ChatRequest -> chatHandler.handleRequest(session, parsedRequest)
-            is WebRTCRequest -> webRTCHandler.handleRequest(session, parsedRequest)
-            else -> session.sendMessage(TextMessage("Unknown request format"))
+        try {
+            when (val parsedRequest = DialogueParser.parseRequest(request.payload)) {
+                is ChatRequest -> chatHandler.handleRequest(session, parsedRequest)
+                is WebRTCRequest -> webRTCHandler.handleRequest(session, parsedRequest)
+                else -> throw ErrorCodeException(OtherErrorCode.UNKNOWN_REQUEST, parsedRequest)
+            }
+        } catch (e: ErrorCodeException) {
+            val errorResponse = webSocketExceptionHandler.handleErrorCodeException(e)
+            session.sendMessage(TextMessage(DialogueParser.serialize(errorResponse)))
         }
     }
 }

@@ -2,7 +2,7 @@ package com.bsuirnethub.validator
 
 import com.bsuirnethub.alias.UserId
 import com.bsuirnethub.entity.UserEntity
-import com.bsuirnethub.exception.rest_status_exception.RestStatusException
+import com.bsuirnethub.exception.error_code_exception.RestStatusException
 import com.bsuirnethub.exception.error_code.rest.UserRestErrorCode
 import org.springframework.stereotype.Component
 
