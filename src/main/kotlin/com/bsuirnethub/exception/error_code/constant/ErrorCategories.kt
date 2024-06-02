@@ -12,5 +12,6 @@ internal object ErrorCategories {
     const val PARSING_ERROR = 8 * MULTIPLIER
     const val SERIALIZATION_ERROR = 9 * MULTIPLIER
     const val UNKNOWN_REQUEST = 10 * MULTIPLIER
+    const val USER_NOT_CONNECTED = 11 * MULTIPLIER
     const val OTHER = 99 * MULTIPLIER
 }

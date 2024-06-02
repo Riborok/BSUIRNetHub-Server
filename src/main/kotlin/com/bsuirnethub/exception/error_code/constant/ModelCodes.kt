@@ -10,5 +10,6 @@ internal object ModelCodes {
     const val USER_CHAT = 6 * MULTIPLIER
     const val MESSAGE = 7 * MULTIPLIER
     const val JSON = 8 * MULTIPLIER
+    const val WEB_RTC = 9 * MULTIPLIER
     const val OTHER = 99 * MULTIPLIER
 }
