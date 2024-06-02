@@ -2,6 +2,7 @@ package com.bsuirnethub.rtc.handler
 
 import com.bsuirnethub.alias.UserId
 import com.bsuirnethub.model.Chat
+import com.bsuirnethub.rtc.SessionExtractor
 import com.bsuirnethub.rtc.dialogue.DialogueParser
 import com.bsuirnethub.rtc.dialogue.chat.ChatRequest
 import com.bsuirnethub.rtc.dialogue.chat.ChatResponse
@@ -18,7 +19,8 @@ class ChatHandler(
     private val messageService: MessageService,
     private val clients: ConcurrentHashMap<UserId, WebSocketSession>,
 ) {
-    fun handleRequest(userId: UserId, chatRequest: ChatRequest) {
+    fun handleRequest(session: WebSocketSession, chatRequest: ChatRequest) {
+        val userId = SessionExtractor.extractSubFromSession(session)
         when (chatRequest) {
             is ChatRequest.Send -> handleSendRequest(userId, chatRequest)
             is ChatRequest.Mark -> handleMarkRequest(userId, chatRequest)

@@ -38,20 +38,19 @@ class SocketHandler(
     }
 
     override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
-        val userId = SessionExtractor.extractSubFromSession(session)
         try {
             val request = DialogueParser.parseRequest(message.payload)
-            handleRequest(userId, request)
+            handleRequest(session, request)
         } catch (e: ErrorCodeException) {
             val errorResponse = webSocketExceptionHandler.handleErrorCodeException(e)
             session.sendMessage(TextMessage(DialogueParser.serialize(errorResponse)))
         }
     }
 
-    private fun handleRequest(userId: UserId, request: Request) {
+    private fun handleRequest(session: WebSocketSession, request: Request) {
         when (request) {
-            is ChatRequest -> chatHandler.handleRequest(userId, request)
-            is WebRTCRequest -> webRTCHandler.handleRequest(userId, request)
+            is ChatRequest -> chatHandler.handleRequest(session, request)
+            is WebRTCRequest -> webRTCHandler.handleRequest(session, request)
             else -> throw ErrorCodeException(OtherErrorCode.UNKNOWN_REQUEST, request)
         }
     }
