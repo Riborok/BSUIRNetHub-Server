@@ -1,6 +1,7 @@
 package com.bsuirnethub.rtc.dialogue
 
 import com.bsuirnethub.rtc.dialogue.chat.ChatResponse
+import com.bsuirnethub.rtc.dialogue.webrtc.WebRTCResponse
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 
@@ -12,10 +13,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 @JsonSubTypes(
     JsonSubTypes.Type(ChatResponse.Mark::class, name = "MARK"),
     JsonSubTypes.Type(ChatResponse.Send::class, name = "SEND"),
-/*    JsonSubTypes.Type(WebRTCResponse.STATE::class, name = "STATE"),
+    JsonSubTypes.Type(WebRTCResponse.STATE::class, name = "STATE"),
     JsonSubTypes.Type(WebRTCResponse.OFFER::class, name = "OFFER"),
     JsonSubTypes.Type(WebRTCResponse.ANSWER::class, name = "ANSWER"),
-    JsonSubTypes.Type(WebRTCResponse.ICE::class, name = "ICE")*/
+    JsonSubTypes.Type(WebRTCResponse.ICE::class, name = "ICE")
 )
 abstract class Response {
     abstract val responseType: DialogueType

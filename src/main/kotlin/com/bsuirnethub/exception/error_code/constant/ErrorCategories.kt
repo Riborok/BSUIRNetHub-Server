@@ -13,5 +13,8 @@ internal object ErrorCategories {
     const val SERIALIZATION_ERROR = 9 * MULTIPLIER
     const val UNKNOWN_REQUEST = 10 * MULTIPLIER
     const val USER_NOT_CONNECTED = 11 * MULTIPLIER
+    const val PARTICIPANT_ID_MISMATCH = 12 * MULTIPLIER
+    const val SESSION_STATE_MISMATCH = 13 * MULTIPLIER
+    const val INVALID_SESSION_STATE = 14 * MULTIPLIER
     const val OTHER = 99 * MULTIPLIER
 }
