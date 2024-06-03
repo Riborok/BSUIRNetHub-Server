@@ -47,10 +47,14 @@ class WebRTCHandler(
 
         val userId = SessionExtractor.extractSubFromSession(session)
         val recipientId = webRTCRequest.recipientId
-        val state = if (clients[recipientId] == null) SessionState.Impossible else SessionState.Ready
-        val response = WebRTCResponse.STATE(userId, state)
+
+        if (clients[recipientId] == null) {
+            throw ErrorCodeException(WebRTCErrorCode.USER_NOT_CONNECTED, recipientId)
+        }
+
+        val response = WebRTCResponse.STATE(userId, webRTCRequest.sessionState)
         val message = TextMessage(DialogueParser.serialize(response))
-        session.sendMessage(message)
+        clients[recipientId]!!.sendMessage(message)
     }
 
     private fun handleOfferRequest(session: WebSocketSession, webRTCRequest: WebRTCRequest.OFFER) {

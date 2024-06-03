@@ -2,13 +2,15 @@ package com.bsuirnethub.rtc.dialogue.webrtc
 
 import com.bsuirnethub.alias.UserId
 import com.bsuirnethub.rtc.dialogue.Request
+import com.bsuirnethub.rtc.session.SessionState
 
 abstract class WebRTCRequest(
     override val requestType: WebRTCDialogueType,
     val recipientId: UserId
 ) : Request() {
     class STATE(
-        recipientId: UserId
+        recipientId: UserId,
+        val sessionState: SessionState
     ) : WebRTCRequest(WebRTCDialogueType.STATE, recipientId)
 
     class OFFER(
