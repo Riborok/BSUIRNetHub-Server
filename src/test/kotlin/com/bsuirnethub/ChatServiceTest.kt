@@ -5,6 +5,7 @@ import com.bsuirnethub.component.UserInitializer
 import com.bsuirnethub.exception.error_code_exception.RestStatusException
 import com.bsuirnethub.extension.combinations
 import com.bsuirnethub.service.ChatService
+import com.bsuirnethub.service.MessageService
 import com.bsuirnethub.service.UserService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -19,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest
 class ChatServiceTest(
     @Autowired val chatService: ChatService,
     @Autowired val userService: UserService,
+    @Autowired val messageService: MessageService,
     @Autowired val userInitializer: UserInitializer,
     @Autowired private val databaseCleanup: DatabaseCleanup
 ) {
@@ -124,6 +126,17 @@ class ChatServiceTest(
         assertThrows<RestStatusException> {
             chatService.getChat(userIds[1], chat.id!!)
         }
+    }
+
+    @Test
+    fun `test getChat`() {
+        val userIds = userInitializer.createAndSaveUsers(2).userIds
+        var chat = chatService.createUniqueChat(listOf(userIds[0], userIds[1]))
+        messageService.saveMessage(userIds[0], chat.id!!, "1")
+        messageService.saveMessage(userIds[0], chat.id!!, "2")
+        messageService.saveMessage(userIds[0], chat.id!!, "3")
+        chat = chatService.getChat(userIds[1], chat.id!!)
+        assertEquals("3", chat.lastMessage?.content)
     }
 
     @Test

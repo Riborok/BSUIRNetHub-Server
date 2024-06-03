@@ -9,7 +9,7 @@ import com.bsuirnethub.validator.UserChatValidator
 import com.bsuirnethub.entity.ChatEntity
 import com.bsuirnethub.entity.UserChatEntity
 import com.bsuirnethub.model.Chat
-import com.bsuirnethub.model.toModel
+import com.bsuirnethub.model.ChatConverter
 import com.bsuirnethub.repository.ChatRepository
 import com.bsuirnethub.repository.UserChatRepository
 import org.springframework.stereotype.Service
@@ -23,6 +23,7 @@ class UserChatService(
     private val userChatFinder: UserChatFinder,
     private val userChatRepository: UserChatRepository,
     private val chatRepository: ChatRepository,
+    private val chatConverter: ChatConverter,
     private val chatValidator: ChatValidator,
     private val userChatValidator: UserChatValidator
 ) {
@@ -32,7 +33,7 @@ class UserChatService(
         chatValidator.validateSenderIdInParticipants(senderId, chatEntity)
         incrementUnreadMessagesExcludingSender(chatEntity, senderId, messageCount)
         val savedChatEntity = chatRepository.save(chatEntity)
-        return savedChatEntity.toModel()
+        return chatConverter.toModel(savedChatEntity)
     }
 
     private fun incrementUnreadMessagesExcludingSender(chatEntity: ChatEntity, senderId: UserId, messageCount: Int) {
@@ -48,7 +49,7 @@ class UserChatService(
         val userChatEntity = userChatFinder.findUserChatEntityByUserEntityAndChatEntityOrThrow(senderEntity, chatEntity)
         decreaseUnreadMessageCount(userChatEntity, messageCount)
         userChatRepository.save(userChatEntity)
-        return chatEntity.toModel()
+        return chatConverter.toModel(chatEntity)
     }
 
     private fun decreaseUnreadMessageCount(userChatEntity: UserChatEntity, messageCount: Int) {

@@ -8,7 +8,7 @@ import com.bsuirnethub.entity.ChatEntity
 import com.bsuirnethub.entity.UserChatEntity
 import com.bsuirnethub.entity.UserEntity
 import com.bsuirnethub.model.Chat
-import com.bsuirnethub.model.toModel
+import com.bsuirnethub.model.ChatConverter
 import com.bsuirnethub.repository.ChatRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -19,6 +19,7 @@ class ChatService(
     private val userFinder: UserFinder,
     private val chatFinder: ChatFinder,
     private val chatRepository: ChatRepository,
+    private val chatConverter: ChatConverter,
     private val chatValidator: ChatValidator,
 ) {
     fun createUniqueChat(participantIds: List<UserId>): Chat {
@@ -27,7 +28,7 @@ class ChatService(
         val chatEntity = createChatEntity(userEntities)
         return chatValidator.validateParticipantsUniqueness(participantIds) {
             val savedChatEntity = chatRepository.save(chatEntity)
-            savedChatEntity.toModel()
+            chatConverter.toModel(savedChatEntity)
         }
     }
 
@@ -53,18 +54,18 @@ class ChatService(
         chatValidator.validateSenderIdInParticipants(senderId, participantIds)
         val userEntities = userFinder.findUserEntitiesByIdsOrThrow(participantIds)
         val chatEntity = chatFinder.findSingleChatEntityByParticipantEntitiesOrThrow(userEntities)
-        return chatEntity.toModel()
+        return chatConverter.toModel(chatEntity)
     }
 
     fun getChat(senderId: UserId, chatId: Long): Chat {
         val chatEntity = chatFinder.findChatEntityByIdOrThrow(chatId)
         chatValidator.validateSenderIdInParticipants(senderId, chatEntity)
-        return chatEntity.toModel()
+        return chatConverter.toModel(chatEntity)
     }
 
     fun getChats(userId: UserId): List<Chat?> {
         val userEntity = userFinder.findUserEntityByIdOrThrow(userId)
         val userChatEntities = userEntity.userChats
-        return userChatEntities.map { it.chat?.toModel() }
+        return userChatEntities.map { it.chat?.let { chat -> chatConverter.toModel(chat) } }
     }
 }
